@@ -1,4 +1,4 @@
-import type { ConversationStyle } from "@/types";
+import type { ConversationStyle, OutputFormat } from "@/types";
 
 const TUTOR_SYSTEM = `You are a study assistant that converts academic text into a natural conversation between a friendly Tutor and a curious Student.
 
@@ -49,10 +49,43 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
   ]
 }`;
 
-export function getSystemPrompt(style: ConversationStyle): string {
+const QUIZ_SYSTEM = `You are an educational assessment expert. Generate a mix of multiple-choice and short-answer questions to test understanding of the provided academic text.
+
+Rules:
+- Generate 5-8 questions, mixing both multiple-choice and short-answer types
+- Focus on key concepts and genuine understanding, not trivial details
+- Multiple-choice questions should have exactly 4 options with one correct answer
+- Short-answer questions should be answerable in 1-3 sentences
+- Include a clear explanation for each answer
+- Order questions from foundational concepts to deeper understanding
+
+Return ONLY valid JSON in this exact format (no markdown, no code fences):
+{
+  "questions": [
+    {
+      "type": "multiple-choice",
+      "question": "...",
+      "options": ["...", "...", "...", "..."],
+      "correctIndex": 0,
+      "explanation": "..."
+    },
+    {
+      "type": "short-answer",
+      "question": "...",
+      "sampleAnswer": "...",
+      "explanation": "..."
+    }
+  ]
+}`;
+
+export function getSystemPrompt(format: OutputFormat, style?: ConversationStyle): string {
+  if (format === "quiz") return QUIZ_SYSTEM;
   return style === "tutor" ? TUTOR_SYSTEM : STUDY_GROUP_SYSTEM;
 }
 
-export function getUserPrompt(text: string): string {
+export function getUserPrompt(format: OutputFormat, text: string): string {
+  if (format === "quiz") {
+    return `Generate quiz questions to test understanding of the following academic text.\n\n---\n${text}\n---`;
+  }
   return `Convert the following academic text into a conversation. Make sure to cover all the key concepts and information.\n\n---\n${text}\n---`;
 }

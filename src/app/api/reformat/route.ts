@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { generateText } from "ai";
+import { generateText, streamText } from "ai";
 import { getModel } from "@/lib/llm/provider";
 import { getSystemPrompt, getUserPrompt } from "@/lib/llm/prompts";
-import type { ConversationStyle, ConversationResult, ReformatRequest } from "@/types";
+import type { ConversationStyle, QuizResult, ReformatRequest } from "@/types";
 
 export async function POST(request: Request) {
   try {
@@ -20,40 +20,49 @@ export async function POST(request: Request) {
       );
     }
 
-    if (format !== "conversation") {
-      return NextResponse.json(
-        { error: "Only conversation format uses the API." },
-        { status: 400 }
-      );
+    if (format === "conversation") {
+      const style: ConversationStyle =
+        conversationStyle === "study-group" ? "study-group" : "tutor";
+
+      const result = streamText({
+        model: getModel(),
+        system: getSystemPrompt("conversation", style),
+        prompt: getUserPrompt("conversation", text),
+        maxOutputTokens: 4096,
+        temperature: 0.7,
+      });
+
+      return result.toTextStreamResponse();
     }
 
-    const style: ConversationStyle = conversationStyle === "study-group" ? "study-group" : "tutor";
+    if (format === "quiz") {
+      const { text: responseText } = await generateText({
+        model: getModel(),
+        system: getSystemPrompt("quiz"),
+        prompt: getUserPrompt("quiz", text),
+        maxOutputTokens: 4096,
+        temperature: 0.7,
+      });
 
-    const { text: responseText } = await generateText({
-      model: getModel(),
-      system: getSystemPrompt(style),
-      prompt: getUserPrompt(text),
-      maxOutputTokens: 4096,
-      temperature: 0.7,
-    });
+      let jsonStr = responseText.trim();
+      if (jsonStr.startsWith("```")) {
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+      }
 
-    // Parse the JSON from Claude's response
-    // Strip markdown code fences if present
-    let jsonStr = responseText.trim();
-    if (jsonStr.startsWith("```")) {
-      jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+      const parsed = JSON.parse(jsonStr);
+
+      const quizResult: QuizResult = {
+        format: "quiz",
+        questions: parsed.questions,
+      };
+
+      return NextResponse.json(quizResult);
     }
 
-    const parsed = JSON.parse(jsonStr);
-
-    const result: ConversationResult = {
-      format: "conversation",
-      style,
-      speakers: parsed.speakers,
-      dialogue: parsed.dialogue,
-    };
-
-    return NextResponse.json(result);
+    return NextResponse.json(
+      { error: "Only conversation and quiz formats use the API." },
+      { status: 400 }
+    );
   } catch (err) {
     console.error("Reformat API error:", err);
 

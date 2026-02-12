@@ -1,4 +1,4 @@
-export type OutputFormat = "conversation" | "bionic" | "rsvp";
+export type OutputFormat = "conversation" | "bionic" | "rsvp" | "quiz";
 
 export type ConversationStyle = "tutor" | "study-group";
 
@@ -35,7 +35,21 @@ export interface RSVPResult {
   words: string[];
 }
 
-export type ReformatResult = ConversationResult | BionicResult | RSVPResult;
+export interface QuizQuestion {
+  type: "multiple-choice" | "short-answer";
+  question: string;
+  options?: string[];
+  correctIndex?: number;
+  sampleAnswer?: string;
+  explanation: string;
+}
+
+export interface QuizResult {
+  format: "quiz";
+  questions: QuizQuestion[];
+}
+
+export type ReformatResult = ConversationResult | BionicResult | RSVPResult | QuizResult;
 
 export interface ReformatRequest {
   text: string;

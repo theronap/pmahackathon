@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LoadingDots } from "@/components/ui/loading";
 import { BionicTextRenderer } from "@/components/renderers/bionic-text-renderer";
 import { ChatBubbleRenderer } from "@/components/renderers/chat-bubble-renderer";
 import { RSVPPlayer } from "@/components/renderers/rsvp-player";
+import { QuizRenderer } from "@/components/renderers/quiz-renderer";
 import { textToBionic } from "@/lib/bionic";
+import { parsePartialConversation } from "@/lib/stream-parser";
 import type {
   OutputFormat,
   ConversationStyle,
+  ConversationResult,
   ReformatResult,
   BionicResult,
   RSVPResult,
 } from "@/types";
 
 const MAX_CHARS = 15000;
+const STORAGE_KEY = "studylens-state";
+const RESULT_KEY = "studylens-result";
 
 const FORMAT_OPTIONS: { value: OutputFormat; label: string; description: string }[] = [
   {
@@ -34,6 +39,11 @@ const FORMAT_OPTIONS: { value: OutputFormat; label: string; description: string 
     label: "RSVP Reader",
     description: "Focus on one word at a time at your pace",
   },
+  {
+    value: "quiz",
+    label: "Quiz",
+    description: "Test your understanding with auto-generated questions",
+  },
 ];
 
 const STYLE_OPTIONS: { value: ConversationStyle; label: string }[] = [
@@ -48,14 +58,113 @@ export default function ToolPage() {
   const [result, setResult] = useState<ReformatResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [streaming, setStreaming] = useState(false);
+  const [streamedResult, setStreamedResult] = useState<ConversationResult | null>(null);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
 
   const charCount = inputText.length;
   const isOverLimit = charCount > MAX_CHARS;
-  const canSubmit = inputText.trim().length > 0 && !isOverLimit && !loading;
+  const canSubmit = inputText.trim().length > 0 && !isOverLimit && !loading && !streaming;
+
+  // Restore state from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const state = JSON.parse(saved);
+        if (state.inputText) setInputText(state.inputText);
+        if (state.format) setFormat(state.format);
+        if (state.conversationStyle) setConversationStyle(state.conversationStyle);
+        if (state.showTypingIndicator !== undefined) setShowTypingIndicator(state.showTypingIndicator);
+      }
+      const savedResult = localStorage.getItem(RESULT_KEY);
+      if (savedResult) {
+        setResult(JSON.parse(savedResult));
+      }
+    } catch {
+      // ignore parse errors
+    }
+    setHydrated(true);
+  }, []);
+
+  // Persist state to localStorage
+  useEffect(() => {
+    if (!hydrated) return;
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ inputText, format, conversationStyle, showTypingIndicator })
+    );
+  }, [inputText, format, conversationStyle, showTypingIndicator, hydrated]);
+
+  // Persist result to localStorage
+  useEffect(() => {
+    if (!hydrated) return;
+    if (result) {
+      localStorage.setItem(RESULT_KEY, JSON.stringify(result));
+    } else {
+      localStorage.removeItem(RESULT_KEY);
+    }
+  }, [result, hydrated]);
+
+  const handleStreamedConversation = useCallback(async () => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const res = await fetch("/api/reformat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: inputText, format: "conversation", conversationStyle }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "Something went wrong. Please try again.");
+    }
+
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+    let accumulated = "";
+
+    setStreaming(true);
+    setStreamedResult(null);
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      accumulated += decoder.decode(value, { stream: true });
+
+      const partial = parsePartialConversation(accumulated, conversationStyle);
+      if (partial) {
+        setStreamedResult(partial);
+      }
+    }
+
+    // Final parse
+    let jsonStr = accumulated.trim();
+    if (jsonStr.startsWith("```")) {
+      jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+    }
+
+    const parsed = JSON.parse(jsonStr);
+    const finalResult: ConversationResult = {
+      format: "conversation",
+      style: conversationStyle,
+      speakers: parsed.speakers,
+      dialogue: parsed.dialogue,
+    };
+
+    setResult(finalResult);
+    setStreamedResult(null);
+    setStreaming(false);
+  }, [inputText, conversationStyle]);
 
   async function handleReformat() {
     setError(null);
     setResult(null);
+    setStreamedResult(null);
 
     if (format === "bionic") {
       const paragraphs = textToBionic(inputText);
@@ -69,12 +178,25 @@ export default function ToolPage() {
       return;
     }
 
+    if (format === "conversation") {
+      try {
+        await handleStreamedConversation();
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+        setStreaming(false);
+        setStreamedResult(null);
+      }
+      return;
+    }
+
+    // Quiz: standard fetch (no streaming)
     setLoading(true);
     try {
       const res = await fetch("/api/reformat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText, format, conversationStyle }),
+        body: JSON.stringify({ text: inputText, format }),
       });
 
       if (!res.ok) {
@@ -90,6 +212,9 @@ export default function ToolPage() {
       setLoading(false);
     }
   }
+
+  // Determine what to display for conversation: streamed partial or final result
+  const displayConversation = streaming ? streamedResult : (result?.format === "conversation" ? result : null);
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
@@ -126,13 +251,14 @@ export default function ToolPage() {
           <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
             Output Format
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {FORMAT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => {
                   setFormat(opt.value);
                   setResult(null);
+                  setStreamedResult(null);
                 }}
                 className={`p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
                   format === opt.value
@@ -171,6 +297,21 @@ export default function ToolPage() {
           )}
         </Card>
 
+        {/* Settings row */}
+        {format === "conversation" && (
+          <div className="flex items-center gap-4 mb-4">
+            <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showTypingIndicator}
+                onChange={(e) => setShowTypingIndicator(e.target.checked)}
+                className="accent-teal-400 h-4 w-4 rounded cursor-pointer"
+              />
+              Show typing indicator
+            </label>
+          </div>
+        )}
+
         {/* Submit */}
         <div className="mb-8">
           <Button
@@ -179,10 +320,10 @@ export default function ToolPage() {
             disabled={!canSubmit}
             className="w-full sm:w-auto"
           >
-            {loading ? (
+            {loading || streaming ? (
               <span className="flex items-center gap-3">
                 <LoadingDots />
-                Reformatting...
+                {streaming ? "Streaming..." : "Generating quiz..."}
               </span>
             ) : (
               "Reformat Text"
@@ -197,8 +338,23 @@ export default function ToolPage() {
           </Card>
         )}
 
-        {/* Output */}
-        {result && (
+        {/* Streaming conversation output */}
+        {streaming && displayConversation && (
+          <Card className="p-6 mb-6" glow>
+            <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+              Result
+            </h2>
+            <ChatBubbleRenderer
+              speakers={displayConversation.speakers}
+              dialogue={displayConversation.dialogue}
+              isStreaming={true}
+              showTypingIndicator={showTypingIndicator}
+            />
+          </Card>
+        )}
+
+        {/* Final output */}
+        {!streaming && result && (
           <Card className="p-6" glow>
             <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
               Result
@@ -213,6 +369,7 @@ export default function ToolPage() {
               />
             )}
             {result.format === "rsvp" && <RSVPPlayer words={result.words} />}
+            {result.format === "quiz" && <QuizRenderer questions={result.questions} />}
           </Card>
         )}
       </div>
