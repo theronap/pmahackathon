@@ -69,12 +69,12 @@ export function FileUpload({ onFileUploaded }: FileUploadProps) {
         onClick={() => inputRef.current?.click()}
         className={`border-2 border-dashed rounded-xl px-6 py-8 text-center cursor-pointer transition-all ${
           dragOver
-            ? "border-brand-400 bg-brand-400/10"
-            : "border-gray-700 hover:border-gray-600 bg-gray-800/20 hover:bg-gray-800/40"
+            ? "border-brand-400 bg-[var(--color-accent-soft)]"
+            : "border-[var(--color-card-border)] hover:border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-alt)]"
         }`}
       >
         {uploading ? (
-          <div className="text-gray-400 text-sm">
+          <div className="text-[var(--color-body)] text-sm">
             <svg
               className="h-6 w-6 mx-auto mb-2 animate-spin text-brand-400"
               fill="none"
@@ -97,9 +97,9 @@ export function FileUpload({ onFileUploaded }: FileUploadProps) {
             Uploading and extracting text...
           </div>
         ) : (
-          <div className="text-gray-400 text-sm">
+          <div className="text-[var(--color-body)] text-sm">
             <svg
-              className="h-8 w-8 mx-auto mb-2 text-gray-500"
+              className="h-8 w-8 mx-auto mb-2 text-[var(--color-muted)]"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
@@ -112,9 +112,9 @@ export function FileUpload({ onFileUploaded }: FileUploadProps) {
               />
             </svg>
             <p>
-              Drop a file here or <span className="text-brand-400">browse</span>
+              Drop a file here or <span className="text-brand-500">browse</span>
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[var(--color-muted)] mt-1">
               PDF, DOCX, or TXT (max 10 MB)
             </p>
           </div>

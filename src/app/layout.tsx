@@ -26,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${instrumentSerif.variable} ${dmSans.variable} font-sans antialiased bg-gray-950 text-gray-100`}>
+    <html lang="en">
+      <body className={`${instrumentSerif.variable} ${dmSans.variable} font-sans antialiased`}>
         <Header />
         {children}
       </body>

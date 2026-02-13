@@ -46,9 +46,9 @@ export default function SignupPage() {
   if (confirmationSent) {
     return (
       <div className="text-center">
-        <div className="h-12 w-12 rounded-full bg-brand-500/20 flex items-center justify-center mx-auto mb-4">
+        <div className="h-12 w-12 rounded-full bg-[var(--color-accent-soft)] flex items-center justify-center mx-auto mb-4">
           <svg
-            className="h-6 w-6 text-brand-400"
+            className="h-6 w-6 text-brand-500"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={2}
@@ -61,14 +61,14 @@ export default function SignupPage() {
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2">Check your email</h1>
-        <p className="text-gray-400 text-sm mb-6">
-          We sent a confirmation link to <span className="text-white">{email}</span>.
+        <h1 className="text-2xl font-bold text-[var(--color-heading)] mb-2">Check your email</h1>
+        <p className="text-[var(--color-body)] text-sm mb-6">
+          We sent a confirmation link to <span className="text-[var(--color-heading)]">{email}</span>.
           Click the link to activate your account.
         </p>
         <Link
           href="/login"
-          className="text-brand-400 hover:text-brand-300 font-medium text-sm"
+          className="text-brand-500 hover:text-brand-600 font-medium text-sm"
         >
           Back to sign in
         </Link>
@@ -79,8 +79,8 @@ export default function SignupPage() {
   return (
     <div>
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Create your account</h1>
-        <p className="text-gray-400 text-sm">
+        <h1 className="text-2xl font-bold text-[var(--color-heading)] mb-2">Create your account</h1>
+        <p className="text-[var(--color-body)] text-sm">
           Start reformatting text in seconds
         </p>
       </div>
@@ -89,7 +89,7 @@ export default function SignupPage() {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-300 mb-1.5"
+            className="block text-sm font-medium text-[var(--color-text)] mb-1.5"
           >
             Email
           </label>
@@ -99,7 +99,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
+            className="w-full bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="you@example.com"
           />
         </div>
@@ -107,7 +107,7 @@ export default function SignupPage() {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-300 mb-1.5"
+            className="block text-sm font-medium text-[var(--color-text)] mb-1.5"
           >
             Password
           </label>
@@ -118,7 +118,7 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
+            className="w-full bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="At least 6 characters"
           />
         </div>
@@ -134,11 +134,11 @@ export default function SignupPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-400 mt-6">
+      <p className="text-center text-sm text-[var(--color-body)] mt-6">
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-brand-400 hover:text-brand-300 font-medium"
+          className="text-brand-500 hover:text-brand-600 font-medium"
         >
           Sign in
         </Link>

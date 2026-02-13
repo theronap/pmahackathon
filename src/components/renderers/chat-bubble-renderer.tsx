@@ -89,12 +89,12 @@ export function ChatBubbleRenderer({
     <div className="space-y-3">
       {/* Controls — only for progressive reveal */}
       {progressiveReveal && (
-        <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-800">
+        <div className="flex items-center justify-between gap-3 pb-2 border-b border-[var(--color-card-border)]">
           <div className="flex items-center gap-2">
             {!revealDone && (
               <button
                 onClick={() => setIsPaused(!isPaused)}
-                className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-1.5 text-xs rounded-lg bg-[var(--color-surface)] text-[var(--color-text)] border border-[var(--color-card-border)] hover:bg-[var(--color-surface-alt)] transition-all cursor-pointer flex items-center gap-1.5"
               >
                 {isPaused ? (
                   <>
@@ -112,7 +112,7 @@ export function ChatBubbleRenderer({
             {!revealDone && (
               <button
                 onClick={() => { setVisibleCount(totalLines); setRevealDone(true); }}
-                className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300 transition-all cursor-pointer"
+                className="px-3 py-1.5 text-xs rounded-lg bg-[var(--color-surface)] text-[var(--color-body)] border border-[var(--color-card-border)] hover:text-[var(--color-text)] transition-all cursor-pointer"
               >
                 Show all
               </button>
@@ -120,15 +120,15 @@ export function ChatBubbleRenderer({
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-500">Speed:</span>
+            <span className="text-xs text-[var(--color-muted)]">Speed:</span>
             {SPEED_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setSpeed(opt.value)}
                 className={`px-2 py-1 text-[11px] rounded-md transition-all cursor-pointer ${
                   speed === opt.value
-                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
-                    : "bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-400"
+                    ? "bg-[var(--color-accent-soft)] text-brand-600 border border-[var(--color-accent-border)]"
+                    : "bg-[var(--color-surface)] text-[var(--color-muted)] border border-[var(--color-card-border)] hover:text-[var(--color-body)]"
                 }`}
               >
                 {opt.label}
@@ -159,8 +159,8 @@ export function ChatBubbleRenderer({
               <div
                 className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                   isFirst
-                    ? "rounded-tl-md bg-gray-800 text-gray-100"
-                    : "rounded-tr-md text-white"
+                    ? "rounded-tl-md bg-[var(--color-surface)] text-[var(--color-text)]"
+                    : "rounded-tr-md text-[var(--color-heading)]"
                 }`}
                 style={
                   !isFirst
@@ -177,11 +177,11 @@ export function ChatBubbleRenderer({
         {/* Typing indicator — streaming or progressive reveal */}
         {((isStreaming && showTypingIndicator) || isRevealing) && (
           <div className="flex flex-col items-start">
-            <div className="max-w-[80%] px-4 py-3 rounded-2xl rounded-tl-md bg-gray-800">
+            <div className="max-w-[80%] px-4 py-3 rounded-2xl rounded-tl-md bg-[var(--color-surface)]">
               <div className="flex gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-gray-500 animate-[bounce_1s_ease-in-out_infinite]" />
-                <span className="h-2 w-2 rounded-full bg-gray-500 animate-[bounce_1s_ease-in-out_0.15s_infinite]" />
-                <span className="h-2 w-2 rounded-full bg-gray-500 animate-[bounce_1s_ease-in-out_0.3s_infinite]" />
+                <span className="h-2 w-2 rounded-full bg-[var(--color-muted)] animate-[bounce_1s_ease-in-out_infinite]" />
+                <span className="h-2 w-2 rounded-full bg-[var(--color-muted)] animate-[bounce_1s_ease-in-out_0.15s_infinite]" />
+                <span className="h-2 w-2 rounded-full bg-[var(--color-muted)] animate-[bounce_1s_ease-in-out_0.3s_infinite]" />
               </div>
             </div>
           </div>

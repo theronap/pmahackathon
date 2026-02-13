@@ -131,25 +131,25 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
   return (
     <div className="flex flex-col items-center" ref={containerRef}>
       {/* Word display with ORP anchor */}
-      <div className="w-full flex flex-col items-center justify-center min-h-[120px] mb-6 bg-gray-800/50 rounded-2xl border border-gray-700 select-none">
+      <div className="w-full flex flex-col items-center justify-center min-h-[120px] mb-6 bg-[var(--color-surface)] rounded-2xl border border-[var(--color-card-border)] select-none">
         {/* Fixation marker */}
-        <div className="text-brand-400 text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
+        <div className="text-brand-500 text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
         {/* Word with fixed anchor position */}
         <div className="flex justify-center text-4xl sm:text-5xl font-mono font-bold tracking-wide">
-          <span className="text-right text-white" style={{ width: "12ch" }}>
+          <span className="text-right text-[var(--color-heading)]" style={{ width: "12ch" }}>
             {currentWord.slice(0, getAnchorIndex(currentWord))}
           </span>
-          <span className="text-brand-400">
+          <span className="text-brand-500">
             {currentWord[getAnchorIndex(currentWord)] ?? ""}
           </span>
-          <span className="text-left text-white" style={{ width: "12ch" }}>
+          <span className="text-left text-[var(--color-heading)]" style={{ width: "12ch" }}>
             {currentWord.slice(getAnchorIndex(currentWord) + 1)}
           </span>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-2 bg-gray-800 rounded-full mb-6 overflow-hidden">
+      <div className="w-full h-2 bg-[var(--color-surface-alt)] rounded-full mb-6 overflow-hidden">
         <div
           className="h-full bg-brand-400 rounded-full transition-all duration-100"
           style={{ width: `${progress}%` }}
@@ -184,9 +184,9 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
 
       {/* Speed slider */}
       <div className="w-full max-w-xs">
-        <label className="flex items-center justify-between text-sm text-gray-400 mb-2">
+        <label className="flex items-center justify-between text-sm text-[var(--color-body)] mb-2">
           <span>Speed</span>
-          <span className="font-mono text-brand-400">{wpm} WPM</span>
+          <span className="font-mono text-brand-500">{wpm} WPM</span>
         </label>
         <input
           type="range"
@@ -197,21 +197,21 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
           onChange={(e) => setWpm(Number(e.target.value))}
           className="w-full accent-brand-400 cursor-pointer"
         />
-        <div className="flex justify-between text-xs text-gray-600 mt-1">
+        <div className="flex justify-between text-xs text-[var(--color-muted)] mt-1">
           <span>100</span>
           <span>600</span>
         </div>
       </div>
 
       {/* Word count + keyboard hint */}
-      <p className="text-xs text-gray-500 mt-4">
+      <p className="text-xs text-[var(--color-muted)] mt-4">
         Word {currentIndex + 1} of {words.length}
       </p>
-      <p className="text-xs text-gray-600 mt-2">
-        <kbd className="px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-400">Space</kbd> play/pause
-        {" "}<kbd className="px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-400">&larr;</kbd>
-        <kbd className="px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-400">&rarr;</kbd> skip
-        {" "}<kbd className="px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-400">R</kbd> reset
+      <p className="text-xs text-[var(--color-muted)] mt-2">
+        <kbd className="px-1.5 py-0.5 rounded bg-[var(--color-surface)] border border-[var(--color-card-border)] text-[var(--color-body)]">Space</kbd> play/pause
+        {" "}<kbd className="px-1.5 py-0.5 rounded bg-[var(--color-surface)] border border-[var(--color-card-border)] text-[var(--color-body)]">&larr;</kbd>
+        <kbd className="px-1.5 py-0.5 rounded bg-[var(--color-surface)] border border-[var(--color-card-border)] text-[var(--color-body)]">&rarr;</kbd> skip
+        {" "}<kbd className="px-1.5 py-0.5 rounded bg-[var(--color-surface)] border border-[var(--color-card-border)] text-[var(--color-body)]">R</kbd> reset
       </p>
     </div>
   );

@@ -293,15 +293,15 @@ function ToolContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen">
       <div className={`${view === "reading" ? "max-w-6xl" : "max-w-4xl"} mx-auto px-4 py-8 sm:py-12 transition-all`}>
 
         {/* ========== INPUT VIEW ========== */}
         {view === "input" && (
           <>
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-white mb-2">Reformat Your Text</h1>
-              <p className="text-gray-400">
+              <h1 className="text-2xl font-bold text-[var(--color-heading)] mb-2">Reformat Your Text</h1>
+              <p className="text-[var(--color-body)]">
                 Paste your lecture notes, syllabus, or textbook excerpt below, or upload a file.
               </p>
             </div>
@@ -312,8 +312,8 @@ function ToolContent() {
                 onClick={() => setInputMode("paste")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   inputMode === "paste"
-                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
-                    : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
+                    ? "bg-[var(--color-accent-soft)] text-brand-600 border border-[var(--color-accent-border)]"
+                    : "bg-[var(--color-surface)] text-[var(--color-body)] border border-[var(--color-card-border)] hover:text-[var(--color-text)]"
                 }`}
               >
                 Paste Text
@@ -322,8 +322,8 @@ function ToolContent() {
                 onClick={() => setInputMode("upload")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   inputMode === "upload"
-                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
-                    : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
+                    ? "bg-[var(--color-accent-soft)] text-brand-600 border border-[var(--color-accent-border)]"
+                    : "bg-[var(--color-surface)] text-[var(--color-body)] border border-[var(--color-card-border)] hover:text-[var(--color-text)]"
                 }`}
               >
                 Upload File
@@ -332,8 +332,8 @@ function ToolContent() {
                 onClick={() => setInputMode("record")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   inputMode === "record"
-                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
-                    : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
+                    ? "bg-[var(--color-accent-soft)] text-brand-600 border border-[var(--color-accent-border)]"
+                    : "bg-[var(--color-surface)] text-[var(--color-body)] border border-[var(--color-card-border)] hover:text-[var(--color-text)]"
                 }`}
               >
                 Record Audio
@@ -372,18 +372,18 @@ function ToolContent() {
                     : "Paste your academic text here..."
                 }
                 rows={8}
-                className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50 resize-y text-base leading-relaxed"
+                className="w-full bg-[var(--color-surface)] border border-[var(--color-card-border)] rounded-xl px-4 py-3 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50 resize-y text-base leading-relaxed"
               />
               <div className="flex justify-between items-center mt-2">
                 <span
                   className={`text-sm ${
-                    isOverLimit ? "text-red-400" : "text-gray-500"
+                    isOverLimit ? "text-red-400" : "text-[var(--color-muted)]"
                   }`}
                 >
                   {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()} characters
                 </span>
                 {fileName && (
-                  <span className="text-sm text-brand-400">
+                  <span className="text-sm text-brand-500">
                     Uploaded: {fileName}
                   </span>
                 )}
@@ -427,7 +427,7 @@ function ToolContent() {
               <Card className="p-8 mb-6">
                 <div className="flex items-center justify-center gap-3">
                   <LoadingDots />
-                  <span className="text-gray-400 text-sm">Generating...</span>
+                  <span className="text-[var(--color-body)] text-sm">Generating...</span>
                 </div>
               </Card>
             )}
@@ -471,9 +471,9 @@ function ToolContent() {
 
                   {/* Plain mode */}
                   {setupConfig.mode === "plain" && (
-                    <div className="prose prose-invert max-w-none">
+                    <div className="prose max-w-none">
                       {inputText.split(/\n\s*\n/).map((para, i) => (
-                        <p key={i} className="text-gray-200 leading-relaxed mb-4">
+                        <p key={i} className="text-[var(--color-text)] leading-relaxed mb-4">
                           {para}
                         </p>
                       ))}
@@ -513,7 +513,7 @@ function ToolContent() {
 export default function ToolPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-950 text-gray-100 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <LoadingDots />
       </div>
     }>

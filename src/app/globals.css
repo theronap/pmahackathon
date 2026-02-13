@@ -9,27 +9,13 @@
   --color-brand-600: #4E8A14;
 }
 
-body {
-  background: #030712;
-  color: #f3f4f6;
-}
-
-/* ── Landing page theme ── */
-.theme-landing {
-  /* Header */
-  --header-bg: rgba(236, 246, 228, 0.92);
-  --header-border: rgba(168, 183, 171, 0.40);
-  --header-text: #3E3E3E;
-  --header-text-hover: #2D4739;
-  --header-accent: #2D4739;
-  --header-accent-bg: rgba(45, 71, 57, 0.08);
-  --header-divider: rgba(168, 183, 171, 0.50);
-
-  /* Landing palette */
+/* ── Global palette (light theme) ── */
+:root {
   --color-bg: #F9F9F7;
   --color-heading: #2D4739;
   --color-body: #5A6B5E;
   --color-text: #3E3E3E;
+  --color-muted: #94A397;
   --color-accent: #73C41D;
   --color-accent-hover: #65AD19;
   --color-card: #EFF2F0;
@@ -43,14 +29,21 @@ body {
   --color-accent-shadow: rgba(115, 196, 29, 0.20);
 }
 
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── Header theme (same for all pages) ── */
+.theme-landing,
 .theme-tool {
-  --header-bg: rgba(3, 7, 18, 0.80);
-  --header-border: rgba(31, 41, 55, 0.60);
-  --header-text: #9ca3af;
-  --header-text-hover: #e5e7eb;
-  --header-accent: #73C41D;
-  --header-accent-bg: rgba(115, 196, 29, 0.10);
-  --header-divider: rgba(31, 41, 55, 1);
+  --header-bg: rgba(236, 246, 228, 0.92);
+  --header-border: rgba(168, 183, 171, 0.40);
+  --header-text: #3E3E3E;
+  --header-text-hover: #2D4739;
+  --header-accent: #2D4739;
+  --header-accent-bg: rgba(45, 71, 57, 0.08);
+  --header-divider: rgba(168, 183, 171, 0.50);
 }
 
 /* ── Breathing glow for hero ── */
@@ -104,12 +97,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: var(--color-border);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  background: var(--color-body);
 }
 
 /* Fade in animation for progressive reveal */
@@ -123,7 +116,7 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
-  background: #1f2937;
+  background: var(--color-surface-alt);
   border-radius: 3px;
   outline: none;
 }
@@ -136,7 +129,7 @@ input[type="range"]::-webkit-slider-thumb {
   background: #73C41D;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid #030712;
+  border: 2px solid var(--color-bg);
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -145,5 +138,5 @@ input[type="range"]::-moz-range-thumb {
   background: #73C41D;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid #030712;
+  border: 2px solid var(--color-bg);
 }

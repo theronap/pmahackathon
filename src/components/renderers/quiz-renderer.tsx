@@ -56,29 +56,29 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
     <div className="space-y-6">
       {/* Score bar */}
       {totalMCRevealed > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/50 border border-gray-700">
-          <span className="text-sm text-gray-400">Score:</span>
-          <span className="text-lg font-bold text-brand-400">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-card-border)]">
+          <span className="text-sm text-[var(--color-body)]">Score:</span>
+          <span className="text-lg font-bold text-brand-500">
             {totalCorrect}/{totalMCRevealed}
           </span>
-          <span className="text-sm text-gray-500">multiple choice correct</span>
+          <span className="text-sm text-[var(--color-muted)]">multiple choice correct</span>
         </div>
       )}
 
       {questions.map((q, idx) => (
         <div
           key={idx}
-          className="p-5 rounded-xl border border-gray-700 bg-gray-800/30"
+          className="p-5 rounded-xl border border-[var(--color-card-border)] bg-[var(--color-card)]"
         >
           <div className="flex items-start gap-3 mb-4">
-            <span className="flex-shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-full bg-brand-500/15 text-brand-400 text-sm font-bold">
+            <span className="flex-shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-full bg-[var(--color-accent-soft)] text-brand-500 text-sm font-bold">
               {idx + 1}
             </span>
             <div>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-700 text-gray-400 mb-2 inline-block">
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-surface-alt)] text-[var(--color-body)] mb-2 inline-block">
                 {q.type === "multiple-choice" ? "Multiple Choice" : "Short Answer"}
               </span>
-              <p className="text-gray-100 mt-1">{q.question}</p>
+              <p className="text-[var(--color-text)] mt-1">{q.question}</p>
             </div>
           </div>
 
@@ -89,13 +89,13 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
                 const isRevealed = revealed[idx];
                 const isCorrect = optIdx === q.correctIndex;
 
-                let optionStyle = "border-gray-700 bg-gray-800/50 hover:border-gray-600";
+                let optionStyle = "border-[var(--color-card-border)] bg-[var(--color-surface)] hover:border-[var(--color-border)]";
                 if (isRevealed && isCorrect) {
                   optionStyle = "border-green-500/50 bg-green-500/10";
                 } else if (isRevealed && isSelected && !isCorrect) {
                   optionStyle = "border-red-500/50 bg-red-500/10";
                 } else if (isSelected) {
-                  optionStyle = "border-brand-400/50 bg-brand-400/10";
+                  optionStyle = "border-[var(--color-accent-border)] bg-[var(--color-accent-soft)]";
                 }
 
                 return (
@@ -107,14 +107,14 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
                       isRevealed ? "cursor-default" : "cursor-pointer"
                     }`}
                   >
-                    <span className="text-gray-400 font-medium mr-2">
+                    <span className="text-[var(--color-body)] font-medium mr-2">
                       {String.fromCharCode(65 + optIdx)}.
                     </span>
-                    <span className={isRevealed && isCorrect ? "text-green-300" : "text-gray-200"}>
+                    <span className={isRevealed && isCorrect ? "text-green-600" : "text-[var(--color-text)]"}>
                       {option}
                     </span>
                     {isRevealed && isCorrect && (
-                      <span className="ml-2 text-green-400 text-xs">&#10003;</span>
+                      <span className="ml-2 text-green-500 text-xs">&#10003;</span>
                     )}
                     {isRevealed && isSelected && !isCorrect && (
                       <span className="ml-2 text-red-400 text-xs">&#10007;</span>
@@ -133,12 +133,12 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
                 placeholder="Type your answer..."
                 rows={3}
                 disabled={revealed[idx]}
-                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 text-sm resize-none disabled:opacity-60"
+                className="w-full bg-[var(--color-surface)] border border-[var(--color-card-border)] rounded-lg px-3 py-2 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-brand-400/50 text-sm resize-none disabled:opacity-60"
               />
               {revealed[idx] && q.sampleAnswer && (
-                <div className="mt-2 p-3 rounded-lg bg-brand-500/10 border border-brand-500/20">
-                  <span className="text-xs font-medium text-brand-400">Sample Answer:</span>
-                  <p className="text-sm text-gray-200 mt-1">{q.sampleAnswer}</p>
+                <div className="mt-2 p-3 rounded-lg bg-[var(--color-accent-soft)] border border-[var(--color-accent-border)]">
+                  <span className="text-xs font-medium text-brand-500">Sample Answer:</span>
+                  <p className="text-sm text-[var(--color-text)] mt-1">{q.sampleAnswer}</p>
                 </div>
               )}
             </div>
@@ -156,9 +156,9 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
               </Button>
             )}
             {revealed[idx] && q.explanation && (
-              <div className="mt-2 p-3 rounded-lg bg-gray-800/50 border border-gray-700">
-                <span className="text-xs font-medium text-gray-400">Explanation:</span>
-                <p className="text-sm text-gray-300 mt-1">{q.explanation}</p>
+              <div className="mt-2 p-3 rounded-lg bg-[var(--color-surface)] border border-[var(--color-card-border)]">
+                <span className="text-xs font-medium text-[var(--color-body)]">Explanation:</span>
+                <p className="text-sm text-[var(--color-text)] mt-1">{q.explanation}</p>
               </div>
             )}
           </div>

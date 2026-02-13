@@ -111,7 +111,7 @@ export function VoiceRecorder({ onTranscript }: VoiceRecorderProps) {
         )}
 
         {transcribing && (
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-[var(--color-body)]">
             <LoadingDots />
             <span>Transcribing...</span>
           </div>

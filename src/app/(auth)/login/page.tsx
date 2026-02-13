@@ -37,8 +37,8 @@ export default function LoginPage() {
   return (
     <div>
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-        <p className="text-gray-400 text-sm">
+        <h1 className="text-2xl font-bold text-[var(--color-heading)] mb-2">Welcome back</h1>
+        <p className="text-[var(--color-body)] text-sm">
           Sign in to your teachMe account
         </p>
       </div>
@@ -47,7 +47,7 @@ export default function LoginPage() {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-300 mb-1.5"
+            className="block text-sm font-medium text-[var(--color-text)] mb-1.5"
           >
             Email
           </label>
@@ -57,7 +57,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
+            className="w-full bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="you@example.com"
           />
         </div>
@@ -65,7 +65,7 @@ export default function LoginPage() {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-300 mb-1.5"
+            className="block text-sm font-medium text-[var(--color-text)] mb-1.5"
           >
             Password
           </label>
@@ -76,7 +76,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
+            className="w-full bg-[var(--color-card)] border border-[var(--color-card-border)] rounded-xl px-4 py-2.5 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="Your password"
           />
         </div>
@@ -92,11 +92,11 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-400 mt-6">
+      <p className="text-center text-sm text-[var(--color-body)] mt-6">
         Don&apos;t have an account?{" "}
         <Link
           href="/signup"
-          className="text-brand-400 hover:text-brand-300 font-medium"
+          className="text-brand-500 hover:text-brand-600 font-medium"
         >
           Sign up
         </Link>
