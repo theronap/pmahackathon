@@ -19,7 +19,7 @@ const FEATURES = [
           <div className="rounded-2xl rounded-tr-sm bg-[#D4DDD6] border border-[#B8C4BA] px-4 py-3 text-sm text-[#2D4739] leading-relaxed max-w-[280px]">
             Yeah! They take glucose and turn it into ATP — energy the cell can use.
           </div>
-          <div className="h-8 w-8 shrink-0 rounded-full bg-[#CCFF00]/20 flex items-center justify-center text-xs font-bold text-[#2D4739]">B</div>
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[#73C41D]/20 flex items-center justify-center text-xs font-bold text-[#2D4739]">B</div>
         </div>
         <div className="flex gap-3 items-start">
           <div className="h-8 w-8 shrink-0 rounded-full bg-[#D4DDD6] flex items-center justify-center text-xs font-bold text-[#2D4739]">C</div>
@@ -47,7 +47,7 @@ const FEATURES = [
           <div className="rounded-2xl rounded-tr-sm bg-[#D4DDD6] border border-[#B8C4BA] px-4 py-3 text-sm text-[#2D4739] leading-relaxed max-w-[280px]">
             Energy! So mitochondria make energy for the cell?
           </div>
-          <div className="h-8 w-8 shrink-0 rounded-full bg-[#CCFF00]/20 flex items-center justify-center text-xs font-bold text-[#2D4739]">S</div>
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[#73C41D]/20 flex items-center justify-center text-xs font-bold text-[#2D4739]">S</div>
         </div>
         <div className="flex gap-3 items-start">
           <div className="h-8 w-8 shrink-0 rounded-full bg-[#D4DDD6] flex items-center justify-center text-xs font-bold text-[#3E3E3E]">T</div>
@@ -135,20 +135,20 @@ const FEATURES = [
     mockup: (
       <div className="flex flex-col items-center justify-center py-6">
         {/* Fixation triangle marker */}
-        <div className="text-[#CCFF00] text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
+        <div className="text-[#73C41D] text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
         {/* Word with ORP anchor — "mitochondria" (12 chars) → anchor index 3 = "o" */}
         <div className="flex justify-center text-4xl font-mono font-bold tracking-wide">
           <span className="text-right text-[#2D4739]" style={{ width: "6ch" }}>
             mit
           </span>
-          <span className="text-[#CCFF00]">o</span>
+          <span className="text-[#73C41D]">o</span>
           <span className="text-left text-[#2D4739]" style={{ width: "12ch" }}>
             chondria
           </span>
         </div>
         {/* Progress bar */}
         <div className="w-48 h-1.5 bg-[#D4DDD6] rounded-full mt-6 overflow-hidden">
-          <div className="w-2/5 h-full bg-[#CCFF00] rounded-full" />
+          <div className="w-2/5 h-full bg-[#73C41D] rounded-full" />
         </div>
         {/* WPM label */}
         <div className="text-xs text-[#5A6B5E] mt-3 tracking-wide">250 WPM</div>
@@ -186,20 +186,20 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
         {/* Radial gradient background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,_rgba(204,255,0,0.08),_transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,_rgba(115,196,29,0.08),_transparent)]" />
         {/* Breathing glow orb */}
-        <div className="hero-glow absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(204,255,0,0.10)_0%,_transparent_70%)] pointer-events-none" />
+        <div className="hero-glow absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(115,196,29,0.10)_0%,_transparent_70%)] pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[rgba(204,255,0,0.12)] border border-[rgba(204,255,0,0.25)] text-[#2D4739] text-sm font-medium mb-8">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#CCFF00] animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[rgba(115,196,29,0.12)] border border-[rgba(115,196,29,0.25)] text-[#2D4739] text-sm font-medium mb-8">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#73C41D] animate-pulse" />
             Built for how your brain actually works
           </div>
 
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl text-[#2D4739] leading-[1.1] mb-6 tracking-tight">
             Study less.
             <br />
-            <span style={{ textShadow: "0 0 40px rgba(204,255,0,0.3)" }}>Understand more.</span>
+            <span style={{ textShadow: "0 0 40px rgba(115,196,29,0.3)" }}>Understand more.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-[#5A6B5E] max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -211,7 +211,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/tool"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#CCFF00] hover:bg-[#B8E600] text-[#2D4739] font-semibold rounded-xl shadow-lg shadow-[rgba(204,255,0,0.20)] transition-all duration-200 text-lg"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#73C41D] hover:bg-[#65AD19] text-[#2D4739] font-semibold rounded-xl shadow-lg shadow-[rgba(115,196,29,0.20)] transition-all duration-200 text-lg"
             >
               Start learning
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -239,7 +239,7 @@ export default function HomePage() {
               {/* Text side */}
               <div className={feature.align === "right" ? "lg:order-2" : ""}>
                 <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#2D4739] uppercase tracking-wider">
-                  <span className="h-2 w-2 rounded-sm bg-[#CCFF00]" />
+                  <span className="h-2 w-2 rounded-sm bg-[#73C41D]" />
                   {feature.eyebrow}
                 </span>
                 <h2 className="font-display text-3xl sm:text-4xl text-[#2D4739] mt-3 mb-4 tracking-tight leading-tight">
@@ -293,7 +293,7 @@ export default function HomePage() {
         <section className="max-w-4xl mx-auto px-4 pb-24 sm:pb-32">
           <div className="relative rounded-2xl border border-[#C8D4CA] bg-[#EFF2F0] px-8 py-14 sm:px-14 sm:py-18 text-center overflow-hidden">
             {/* Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse,_rgba(204,255,0,0.10)_0%,_transparent_70%)] pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse,_rgba(115,196,29,0.10)_0%,_transparent_70%)] pointer-events-none" />
 
             <div className="relative">
               <h2 className="font-display text-3xl sm:text-4xl text-[#2D4739] mb-4 tracking-tight">
@@ -305,7 +305,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#CCFF00] hover:bg-[#B8E600] text-[#2D4739] font-semibold rounded-xl shadow-lg shadow-[rgba(204,255,0,0.20)] transition-all duration-200 text-lg"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#73C41D] hover:bg-[#65AD19] text-[#2D4739] font-semibold rounded-xl shadow-lg shadow-[rgba(115,196,29,0.20)] transition-all duration-200 text-lg"
                 >
                   Get started free
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
