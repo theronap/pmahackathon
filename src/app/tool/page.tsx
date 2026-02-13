@@ -8,8 +8,12 @@ import { BionicTextRenderer } from "@/components/renderers/bionic-text-renderer"
 import { ChatBubbleRenderer } from "@/components/renderers/chat-bubble-renderer";
 import { RSVPPlayer } from "@/components/renderers/rsvp-player";
 import { QuizRenderer } from "@/components/renderers/quiz-renderer";
+import { FileUpload } from "@/components/file-upload";
 import { textToBionic } from "@/lib/bionic";
 import { parsePartialConversation } from "@/lib/stream-parser";
+import { createClient } from "@/lib/supabase/client";
+import { getProfile, updatePreferences } from "@/lib/db/profile";
+import { saveSession } from "@/lib/db/sessions";
 import type {
   OutputFormat,
   ConversationStyle,
@@ -20,8 +24,6 @@ import type {
 } from "@/types";
 
 const MAX_CHARS = 15000;
-const STORAGE_KEY = "studylens-state";
-const RESULT_KEY = "studylens-result";
 
 const FORMAT_OPTIONS: { value: OutputFormat; label: string; description: string }[] = [
   {
@@ -51,6 +53,8 @@ const STYLE_OPTIONS: { value: ConversationStyle; label: string }[] = [
   { value: "study-group", label: "Study Group" },
 ];
 
+type InputMode = "paste" | "upload";
+
 export default function ToolPage() {
   const [inputText, setInputText] = useState("");
   const [format, setFormat] = useState<OutputFormat>("conversation");
@@ -61,52 +65,68 @@ export default function ToolPage() {
   const [streaming, setStreaming] = useState(false);
   const [streamedResult, setStreamedResult] = useState<ConversationResult | null>(null);
   const [showTypingIndicator, setShowTypingIndicator] = useState(true);
-  const [hydrated, setHydrated] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  // File upload state
+  const [inputMode, setInputMode] = useState<InputMode>("paste");
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileStoragePath, setFileStoragePath] = useState<string | null>(null);
+
   const abortRef = useRef<AbortController | null>(null);
 
   const charCount = inputText.length;
   const isOverLimit = charCount > MAX_CHARS;
   const canSubmit = inputText.trim().length > 0 && !isOverLimit && !loading && !streaming;
 
-  // Restore state from localStorage on mount
+  // Load preferences from profile on mount
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const state = JSON.parse(saved);
-        if (state.inputText) setInputText(state.inputText);
-        if (state.format) setFormat(state.format);
-        if (state.conversationStyle) setConversationStyle(state.conversationStyle);
-        if (state.showTypingIndicator !== undefined) setShowTypingIndicator(state.showTypingIndicator);
+    const supabase = createClient();
+    getProfile(supabase).then((profile) => {
+      if (profile) {
+        setFormat(profile.preferred_format);
+        setConversationStyle(profile.preferred_style);
+        setShowTypingIndicator(profile.show_typing_indicator);
       }
-      const savedResult = localStorage.getItem(RESULT_KEY);
-      if (savedResult) {
-        setResult(JSON.parse(savedResult));
-      }
-    } catch {
-      // ignore parse errors
-    }
-    setHydrated(true);
+      setReady(true);
+    });
   }, []);
 
-  // Persist state to localStorage
+  // Save preferences to profile when they change
+  const prefsRef = useRef({ format, conversationStyle, showTypingIndicator });
   useEffect(() => {
-    if (!hydrated) return;
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ inputText, format, conversationStyle, showTypingIndicator })
-    );
-  }, [inputText, format, conversationStyle, showTypingIndicator, hydrated]);
+    if (!ready) return;
+    const prev = prefsRef.current;
+    if (
+      prev.format === format &&
+      prev.conversationStyle === conversationStyle &&
+      prev.showTypingIndicator === showTypingIndicator
+    )
+      return;
+    prefsRef.current = { format, conversationStyle, showTypingIndicator };
+    const supabase = createClient();
+    updatePreferences(supabase, {
+      preferred_format: format,
+      preferred_style: conversationStyle,
+      show_typing_indicator: showTypingIndicator,
+    });
+  }, [format, conversationStyle, showTypingIndicator, ready]);
 
-  // Persist result to localStorage
-  useEffect(() => {
-    if (!hydrated) return;
-    if (result) {
-      localStorage.setItem(RESULT_KEY, JSON.stringify(result));
-    } else {
-      localStorage.removeItem(RESULT_KEY);
-    }
-  }, [result, hydrated]);
+  // Save session to DB after getting a result
+  const saveResultToDb = useCallback(
+    async (resultData: ReformatResult) => {
+      const supabase = createClient();
+      await saveSession(supabase, {
+        input_text: inputText,
+        input_source: inputMode === "upload" && fileName ? "file_upload" : "paste",
+        file_name: fileName,
+        file_storage_path: fileStoragePath,
+        format,
+        conversation_style: format === "conversation" ? conversationStyle : null,
+        result: resultData,
+      });
+    },
+    [inputText, inputMode, fileName, fileStoragePath, format, conversationStyle]
+  );
 
   const handleStreamedConversation = useCallback(async () => {
     const controller = new AbortController();
@@ -159,7 +179,10 @@ export default function ToolPage() {
     setResult(finalResult);
     setStreamedResult(null);
     setStreaming(false);
-  }, [inputText, conversationStyle]);
+
+    // Save to DB
+    await saveResultToDb(finalResult);
+  }, [inputText, conversationStyle, saveResultToDb]);
 
   async function handleReformat() {
     setError(null);
@@ -168,13 +191,17 @@ export default function ToolPage() {
 
     if (format === "bionic") {
       const paragraphs = textToBionic(inputText);
-      setResult({ format: "bionic", paragraphs } as BionicResult);
+      const bionicResult: BionicResult = { format: "bionic", paragraphs };
+      setResult(bionicResult);
+      await saveResultToDb(bionicResult);
       return;
     }
 
     if (format === "rsvp") {
       const words = inputText.split(/\s+/).filter((w) => w.length > 0);
-      setResult({ format: "rsvp", words } as RSVPResult);
+      const rsvpResult: RSVPResult = { format: "rsvp", words };
+      setResult(rsvpResult);
+      await saveResultToDb(rsvpResult);
       return;
     }
 
@@ -206,11 +233,18 @@ export default function ToolPage() {
 
       const data = await res.json();
       setResult(data);
+      await saveResultToDb(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleFileUploaded(text: string, name: string, storagePath: string) {
+    setInputText(text);
+    setFileName(name);
+    setFileStoragePath(storagePath);
   }
 
   // Determine what to display for conversation: streamed partial or final result
@@ -222,16 +256,57 @@ export default function ToolPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">Reformat Your Text</h1>
           <p className="text-gray-400">
-            Paste your lecture notes, syllabus, or textbook excerpt below.
+            Paste your lecture notes, syllabus, or textbook excerpt below, or upload a file.
           </p>
+        </div>
+
+        {/* Input mode toggle */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setInputMode("paste")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              inputMode === "paste"
+                ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
+            }`}
+          >
+            Paste Text
+          </button>
+          <button
+            onClick={() => setInputMode("upload")}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              inputMode === "upload"
+                ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
+            }`}
+          >
+            Upload File
+          </button>
         </div>
 
         {/* Input */}
         <Card className="p-6 mb-6">
+          {inputMode === "upload" && (
+            <div className="mb-4">
+              <FileUpload onFileUploaded={handleFileUploaded} />
+            </div>
+          )}
+
           <textarea
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Paste your academic text here..."
+            onChange={(e) => {
+              setInputText(e.target.value);
+              // Clear file metadata if user manually edits after upload
+              if (inputMode === "upload") {
+                setFileName(null);
+                setFileStoragePath(null);
+              }
+            }}
+            placeholder={
+              inputMode === "upload"
+                ? "File text will appear here, or you can edit it..."
+                : "Paste your academic text here..."
+            }
             rows={8}
             className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50 resize-y text-base leading-relaxed"
           />
@@ -243,6 +318,11 @@ export default function ToolPage() {
             >
               {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()} characters
             </span>
+            {fileName && (
+              <span className="text-sm text-teal-400">
+                Uploaded: {fileName}
+              </span>
+            )}
           </div>
         </Card>
 

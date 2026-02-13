@@ -56,3 +56,29 @@ export interface ReformatRequest {
   format: OutputFormat;
   conversationStyle?: ConversationStyle;
 }
+
+// Supabase table types
+
+export interface Profile {
+  id: string;
+  email: string;
+  display_name: string | null;
+  preferred_format: OutputFormat;
+  preferred_style: ConversationStyle;
+  show_typing_indicator: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Session {
+  id: string;
+  user_id: string;
+  input_text: string;
+  input_source: "paste" | "file_upload";
+  file_name: string | null;
+  file_storage_path: string | null;
+  format: OutputFormat;
+  conversation_style: ConversationStyle | null;
+  result: ReformatResult;
+  created_at: string;
+}

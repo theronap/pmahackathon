@@ -2,10 +2,24 @@ import { NextResponse } from "next/server";
 import { generateText, streamText } from "ai";
 import { getModel } from "@/lib/llm/provider";
 import { getSystemPrompt, getUserPrompt } from "@/lib/llm/prompts";
+import { createClient } from "@/lib/supabase/server";
 import type { ConversationStyle, QuizResult, ReformatRequest } from "@/types";
 
 export async function POST(request: Request) {
   try {
+    // Auth check
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 }
+      );
+    }
+
     const body: ReformatRequest = await request.json();
     const { text, format, conversationStyle = "tutor" } = body;
 

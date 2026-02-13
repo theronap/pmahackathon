@@ -1,11 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-xl">
@@ -54,6 +82,32 @@ export function Header() {
           >
             Tool
           </Link>
+
+          {user ? (
+            <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-800">
+              <span className="text-sm text-gray-400 hidden sm:inline truncate max-w-[160px]">
+                {user.email}
+              </span>
+              <button
+                onClick={handleSignOut}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-colors cursor-pointer"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ml-2 pl-2 border-l border-gray-800",
+                pathname === "/login"
+                  ? "text-teal-300 bg-teal-400/10"
+                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
+              )}
+            >
+              Log In
+            </Link>
+          )}
         </nav>
       </div>
     </header>
