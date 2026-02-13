@@ -32,10 +32,16 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Protected routes: /tool and /api/* (except auth callback)
+  // Allow demo access to /tool and /api/chat without auth
+  const isDemo =
+    pathname.startsWith("/tool") &&
+    request.nextUrl.searchParams.get("demo") === "1";
+  const isChatApi = pathname.startsWith("/api/chat");
+
+  // Protected routes: /tool and /api/* (except auth callback, /api/chat)
   const isProtected =
-    pathname.startsWith("/tool") ||
-    (pathname.startsWith("/api") && !pathname.startsWith("/api/auth"));
+    (pathname.startsWith("/tool") && !isDemo) ||
+    (pathname.startsWith("/api") && !pathname.startsWith("/api/auth") && !isChatApi);
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();

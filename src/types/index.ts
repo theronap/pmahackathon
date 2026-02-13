@@ -1,4 +1,4 @@
-export type OutputFormat = "conversation" | "bionic" | "rsvp" | "quiz";
+export type OutputFormat = "conversation" | "bionic" | "rsvp" | "quiz" | "groupchat";
 
 export type ConversationStyle = "tutor" | "study-group";
 
@@ -81,4 +81,37 @@ export interface Session {
   conversation_style: ConversationStyle | null;
   result: ReformatResult;
   created_at: string;
+}
+
+// Learning flow types
+
+export type LearningMode = "focus" | "story" | "game" | "groupchat" | "rsvp" | "plain";
+
+export type TimePreference = "10min" | "15min" | "30min" | "custom" | "nolimit";
+
+export type GoalPreference = "finish" | "2chunks";
+
+export interface SetupConfig {
+  mode: LearningMode;
+  time: TimePreference | null;
+  goal: GoalPreference | null;
+}
+
+export interface TextChunk {
+  index: number;
+  text: string;
+  wordCount: number;
+}
+
+export interface GroupChatMessage {
+  id: string;
+  sender: string;
+  text: string;
+  isUser: boolean;
+  color: string;
+}
+
+export interface GroupChatResult {
+  format: "groupchat";
+  messages: GroupChatMessage[];
 }

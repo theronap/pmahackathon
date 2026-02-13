@@ -87,15 +87,23 @@ export default function HomePage() {
             back in formats designed to reduce cognitive load for students with
             ADHD and anxiety.
           </p>
-          <Link
-            href="/tool"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 hover:bg-teal-400 text-white font-semibold rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 text-lg"
-          >
-            Try it now
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <Link
+              href="/tool"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 hover:bg-teal-400 text-white font-semibold rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 text-lg"
+            >
+              Paste or upload &rarr; Start learning
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+            <Link
+              href="/try"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-xl border border-gray-700 transition-all duration-200 text-lg"
+            >
+              Try a quick demo
+            </Link>
+          </div>
         </div>
       </section>
 

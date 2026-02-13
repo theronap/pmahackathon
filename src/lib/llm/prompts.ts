@@ -49,6 +49,42 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
   ]
 }`;
 
+const GROUP_CHAT_SYSTEM = `You are a study assistant that converts academic text into a casual group chat between three friends: Casey, Riley, and Morgan. They are texting each other about what they just read.
+
+Rules:
+- Casey is enthusiastic and good at summarizing key points
+- Riley is analytical and likes to dig deeper into details
+- Morgan asks practical questions like "wait how does this apply to..."
+- Generate 8-15 short chat messages (1-2 sentences each, like real texts)
+- Cover the key concepts from the text naturally through the conversation
+- Use casual texting style: "omg", "ok so basically", "wait what", "ngl", etc.
+- Make it feel like a real group chat, not a lecture
+
+Return ONLY valid JSON in this exact format (no markdown, no code fences):
+{
+  "messages": [
+    { "sender": "Casey", "text": "..." },
+    { "sender": "Riley", "text": "..." },
+    { "sender": "Morgan", "text": "..." }
+  ]
+}`;
+
+const GROUP_CHAT_REPLY_SYSTEM = `You are roleplaying as one of three friends (Casey, Riley, or Morgan) in a study group chat. A user has just sent a message in the group chat where everyone is discussing an academic text.
+
+Choose the most appropriate friend to reply:
+- Casey: enthusiastic, good at summarizing, encouraging
+- Riley: analytical, likes details, connects ideas
+- Morgan: practical, asks about applications, relatable
+
+Rules:
+- Reply as ONE friend only (pick the most natural one to respond)
+- Keep the reply to 1-2 sentences, casual texting style
+- Stay on topic with the academic text being discussed
+- Be helpful and engaging, like a real friend would be
+
+Return ONLY valid JSON (no markdown, no code fences):
+{ "sender": "Casey", "text": "..." }`;
+
 const QUIZ_SYSTEM = `You are an educational assessment expert. Generate a mix of multiple-choice and short-answer questions to test understanding of the provided academic text.
 
 Rules:
@@ -79,13 +115,21 @@ Return ONLY valid JSON in this exact format (no markdown, no code fences):
 }`;
 
 export function getSystemPrompt(format: OutputFormat, style?: ConversationStyle): string {
+  if (format === "groupchat") return GROUP_CHAT_SYSTEM;
   if (format === "quiz") return QUIZ_SYSTEM;
   return style === "tutor" ? TUTOR_SYSTEM : STUDY_GROUP_SYSTEM;
 }
 
 export function getUserPrompt(format: OutputFormat, text: string): string {
+  if (format === "groupchat") {
+    return `Convert the following academic text into a group chat conversation between friends. Cover the key concepts.\n\n---\n${text}\n---`;
+  }
   if (format === "quiz") {
     return `Generate quiz questions to test understanding of the following academic text.\n\n---\n${text}\n---`;
   }
   return `Convert the following academic text into a conversation. Make sure to cover all the key concepts and information.\n\n---\n${text}\n---`;
+}
+
+export function getGroupChatReplySystemPrompt(): string {
+  return GROUP_CHAT_REPLY_SYSTEM;
 }

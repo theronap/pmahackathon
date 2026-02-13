@@ -3,25 +3,27 @@ import { generateText, streamText } from "ai";
 import { getModel } from "@/lib/llm/provider";
 import { getSystemPrompt, getUserPrompt } from "@/lib/llm/prompts";
 import { createClient } from "@/lib/supabase/server";
-import type { ConversationStyle, QuizResult, ReformatRequest } from "@/types";
+import type { ConversationStyle, QuizResult, GroupChatResult, ReformatRequest } from "@/types";
 
 export async function POST(request: Request) {
   try {
-    // Auth check
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const body = await request.json();
+    const { text, format, conversationStyle = "tutor", demo } = body as ReformatRequest & { demo?: boolean };
 
-    if (!user) {
-      return NextResponse.json(
-        { error: "Authentication required." },
-        { status: 401 }
-      );
+    // Auth check (skip for demo)
+    if (!demo) {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        return NextResponse.json(
+          { error: "Authentication required." },
+          { status: 401 }
+        );
+      }
     }
-
-    const body: ReformatRequest = await request.json();
-    const { text, format, conversationStyle = "tutor" } = body;
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {
       return NextResponse.json({ error: "Text is required." }, { status: 400 });
@@ -73,8 +75,46 @@ export async function POST(request: Request) {
       return NextResponse.json(quizResult);
     }
 
+    if (format === "groupchat") {
+      const { text: responseText } = await generateText({
+        model: getModel(),
+        system: getSystemPrompt("groupchat"),
+        prompt: getUserPrompt("groupchat", text),
+        maxOutputTokens: 2048,
+        temperature: 0.8,
+      });
+
+      let jsonStr = responseText.trim();
+      if (jsonStr.startsWith("```")) {
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+      }
+
+      const parsed = JSON.parse(jsonStr);
+
+      const COLORS: Record<string, string> = {
+        Casey: "#2dd4bf",
+        Riley: "#a78bfa",
+        Morgan: "#fb923c",
+      };
+
+      const groupChatResult: GroupChatResult = {
+        format: "groupchat",
+        messages: parsed.messages.map(
+          (m: { sender: string; text: string }, i: number) => ({
+            id: `msg-${i}`,
+            sender: m.sender,
+            text: m.text,
+            isUser: false,
+            color: COLORS[m.sender] || "#2dd4bf",
+          })
+        ),
+      };
+
+      return NextResponse.json(groupChatResult);
+    }
+
     return NextResponse.json(
-      { error: "Only conversation and quiz formats use the API." },
+      { error: "Only conversation, quiz, and groupchat formats use the API." },
       { status: 400 }
     );
   } catch (err) {
