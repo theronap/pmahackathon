@@ -60,25 +60,7 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Upload to Supabase Storage
-    const fileId = crypto.randomUUID();
-    const storagePath = `${user.id}/${fileId}-${file.name}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("uploads")
-      .upload(storagePath, buffer, {
-        contentType: file.type || "application/octet-stream",
-      });
-
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
-      return NextResponse.json(
-        { error: "Failed to upload file." },
-        { status: 500 }
-      );
-    }
-
-    // Extract text based on file type
+    // Extract text first (this is the critical operation)
     let text = "";
 
     if (fileName.endsWith(".txt")) {
@@ -92,6 +74,27 @@ export async function POST(request: Request) {
       const mammoth = await import("mammoth");
       const result = await mammoth.extractRawText({ buffer });
       text = result.value;
+    }
+
+    // Best-effort upload to Supabase Storage
+    let storagePath: string | null = null;
+    try {
+      const fileId = crypto.randomUUID();
+      const path = `${user.id}/${fileId}-${file.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("uploads")
+        .upload(path, buffer, {
+          contentType: file.type || "application/octet-stream",
+        });
+
+      if (!uploadError) {
+        storagePath = path;
+      } else {
+        console.error("Storage upload error (non-fatal):", uploadError);
+      }
+    } catch (storageErr) {
+      console.error("Storage upload exception (non-fatal):", storageErr);
     }
 
     return NextResponse.json({

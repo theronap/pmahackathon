@@ -87,7 +87,7 @@ export interface Session {
 
 export type LearningMode = "focus" | "story" | "quiz" | "groupchat" | "rsvp" | "plain";
 
-export type TimePreference = "10min" | "15min" | "30min" | "custom" | "nolimit";
+export type TimePreference = "10min" | "15min" | "30min" | "nolimit";
 
 export interface SetupConfig {
   mode: LearningMode;

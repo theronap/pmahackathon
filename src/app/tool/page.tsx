@@ -286,7 +286,7 @@ function ToolContent() {
     setGroupChatMessages([]);
   }
 
-  function handleFileUploaded(text: string, name: string, storagePath: string) {
+  function handleFileUploaded(text: string, name: string, storagePath: string | null) {
     setInputText(text);
     setFileName(name);
     setFileStoragePath(storagePath);
@@ -447,6 +447,8 @@ function ToolContent() {
                       speakers={result.speakers}
                       dialogue={result.dialogue}
                       progressiveReveal
+                      chunkText={inputText}
+                      conversationStyle={conversationStyle}
                     />
                   )}
 

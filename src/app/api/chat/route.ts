@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { generateText } from "ai";
 import { getModel } from "@/lib/llm/provider";
-import { getGroupChatReplySystemPrompt } from "@/lib/llm/prompts";
+import { getGroupChatReplySystemPrompt, getStoryReplySystemPrompt } from "@/lib/llm/prompts";
+import type { ConversationStyle } from "@/types";
 
 export async function POST(request: Request) {
   try {
-    const { chunk, thread, userMessage } = await request.json();
+    const { chunk, thread, userMessage, mode, conversationStyle } = await request.json();
 
     if (!chunk || !userMessage) {
       return NextResponse.json(
@@ -14,14 +15,18 @@ export async function POST(request: Request) {
       );
     }
 
+    const systemPrompt = mode === "story"
+      ? getStoryReplySystemPrompt((conversationStyle as ConversationStyle) || "tutor")
+      : getGroupChatReplySystemPrompt();
+
     const threadContext = (thread || [])
-      .map((m: { sender: string; text: string }) => `${m.sender}: ${m.text}`)
+      .map((m: { sender?: string; speaker?: string; text: string }) => `${m.sender || m.speaker}: ${m.text}`)
       .join("\n");
 
     const { text: responseText } = await generateText({
       model: getModel(),
-      system: getGroupChatReplySystemPrompt(),
-      prompt: `Academic text being discussed:\n---\n${chunk}\n---\n\nRecent chat:\n${threadContext}\n\nUser just said: "${userMessage}"\n\nReply as the most appropriate friend.`,
+      system: systemPrompt,
+      prompt: `Academic text being discussed:\n---\n${chunk}\n---\n\nRecent conversation:\n${threadContext}\n\nUser just said: "${userMessage}"\n\nReply as the most appropriate character.`,
       maxOutputTokens: 256,
       temperature: 0.8,
     });
@@ -34,7 +39,7 @@ export async function POST(request: Request) {
     const parsed = JSON.parse(jsonStr);
 
     return NextResponse.json({
-      sender: parsed.sender,
+      sender: parsed.sender || parsed.speaker,
       text: parsed.text,
     });
   } catch (err) {

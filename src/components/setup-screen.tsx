@@ -18,7 +18,6 @@ const TIME_OPTIONS: { value: TimePreference; label: string }[] = [
   { value: "10min", label: "10 min" },
   { value: "15min", label: "15 min" },
   { value: "30min", label: "30 min" },
-  { value: "custom", label: "Custom" },
   { value: "nolimit", label: "No limit" },
 ];
 

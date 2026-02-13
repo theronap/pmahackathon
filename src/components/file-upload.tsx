@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 
 interface FileUploadProps {
-  onFileUploaded: (text: string, fileName: string, storagePath: string) => void;
+  onFileUploaded: (text: string, fileName: string, storagePath: string | null) => void;
 }
 
 export function FileUpload({ onFileUploaded }: FileUploadProps) {

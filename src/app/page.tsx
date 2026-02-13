@@ -344,7 +344,7 @@ export default function HomePage() {
                   </svg>
                 </Link>
                 <Link
-                  href="/try"
+                  href="/tool?sample=1&demo=1"
                   className="inline-flex items-center gap-2 px-6 py-3 text-[var(--color-body)] hover:text-[var(--color-heading)] font-medium transition-colors duration-200 text-base"
                 >
                   Try a demo first
