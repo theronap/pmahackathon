@@ -23,7 +23,7 @@ export function CompletionScreen({ chunkCount, onFinish }: CompletionScreenProps
         <p className="text-gray-400 text-sm mb-6">
           {chunkCount} chunk{chunkCount !== 1 ? "s" : ""} finished
         </p>
-        <Button onClick={onFinish}>Finish</Button>
+        <Button onClick={onFinish}>Try another mode</Button>
       </Card>
     </div>
   );

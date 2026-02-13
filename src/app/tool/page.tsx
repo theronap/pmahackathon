@@ -305,7 +305,6 @@ function ToolContent() {
 
   function handleFinish() {
     setView("input");
-    setInputText("");
     setChunks([]);
     setCurrentChunkIndex(0);
     setSetupConfig(null);
