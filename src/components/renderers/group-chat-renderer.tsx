@@ -38,7 +38,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
   const [visibleCount, setVisibleCount] = useState(0);
   const visibleCountRef = useRef(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [speed, setSpeed] = useState(2000);
+  const [speed, setSpeed] = useState(3500);
   const [revealDone, setRevealDone] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
