@@ -17,6 +17,12 @@ const SPEED_OPTIONS = [
   { label: "Fast", value: 800 },
 ];
 
+const COLORS: Record<string, string> = {
+  Casey: "#2dd4bf",
+  Riley: "#a78bfa",
+  Morgan: "#fb923c",
+};
+
 interface GroupChatRendererProps {
   messages: GroupChatMessage[];
   chunkText: string;
@@ -26,21 +32,31 @@ interface GroupChatRendererProps {
 export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: GroupChatRendererProps) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Combined messages: original + user-inserted exchanges spliced in place
+  const [combinedMessages, setCombinedMessages] = useState<GroupChatMessage[]>(messages);
   const [visibleCount, setVisibleCount] = useState(0);
+  const visibleCountRef = useRef(0);
   const [isPaused, setIsPaused] = useState(false);
   const [speed, setSpeed] = useState(2000);
   const [revealDone, setRevealDone] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const totalMessagesRef = useRef(messages.length);
 
-  // Count only the initial AI messages (not user-added ones)
-  const initialMessageCount = useRef(messages.length);
+  // Keep visibleCountRef in sync
   useEffect(() => {
-    // Reset on fresh set of messages (new chunk)
+    visibleCountRef.current = visibleCount;
+  }, [visibleCount]);
+
+  // Reset on fresh set of messages (new chunk)
+  useEffect(() => {
     if (messages.length > 0 && messages.every((m) => !m.isUser)) {
-      initialMessageCount.current = messages.length;
+      setCombinedMessages(messages);
+      totalMessagesRef.current = messages.length;
       setVisibleCount(0);
+      visibleCountRef.current = 0;
       setRevealDone(false);
       setIsPaused(false);
     }
@@ -49,10 +65,11 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
   // Progressive reveal timer
   const revealNext = useCallback(() => {
     setVisibleCount((prev) => {
+      const total = totalMessagesRef.current;
       const next = prev + 1;
-      if (next >= initialMessageCount.current) {
+      if (next >= total) {
         setRevealDone(true);
-        return initialMessageCount.current;
+        return total;
       }
       return next;
     });
@@ -64,7 +81,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
       return;
     }
 
-    if (visibleCount < initialMessageCount.current) {
+    if (visibleCount < totalMessagesRef.current) {
       timerRef.current = setTimeout(revealNext, speed);
     }
 
@@ -78,14 +95,10 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [visibleCount, messages.length]);
+  }, [visibleCount]);
 
-  // Show initial messages (up to visibleCount) plus any user-added messages
-  const visibleMessages = [
-    ...messages.slice(0, visibleCount),
-    ...messages.slice(initialMessageCount.current),
-  ];
-
+  const visibleMessages = combinedMessages.slice(0, visibleCount);
+  const isRevealing = !revealDone && !isPaused && visibleCount < totalMessagesRef.current;
   const canInteract = isPaused || revealDone;
 
   function handlePause() {
@@ -98,13 +111,17 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
   }
 
   function handleShowAll() {
-    setVisibleCount(initialMessageCount.current);
+    const total = totalMessagesRef.current;
+    setVisibleCount(total);
+    visibleCountRef.current = total;
     setRevealDone(true);
     setIsPaused(false);
   }
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
+
+    const currentPos = visibleCountRef.current;
 
     const userMsg: GroupChatMessage = {
       id: `user-${Date.now()}`,
@@ -114,18 +131,32 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
       color: "#94a3b8",
     };
 
-    const updated = [...messages, userMsg];
-    onMessagesUpdate(updated);
+    // Splice user message at current reveal position
+    setCombinedMessages((prev) => {
+      const updated = [...prev];
+      updated.splice(currentPos, 0, userMsg);
+      return updated;
+    });
+    totalMessagesRef.current += 1;
+    setVisibleCount(currentPos + 1);
+    visibleCountRef.current = currentPos + 1;
     setInput("");
     setLoading(true);
 
     try {
+      // Build thread context from visible lines
+      const threadLines = combinedMessages
+        .slice(0, currentPos)
+        .concat(userMsg)
+        .slice(-10)
+        .map((m) => ({ sender: m.sender, text: m.text }));
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chunk: chunkText,
-          thread: visibleMessages.concat(userMsg).slice(-10).map((m) => ({ sender: m.sender, text: m.text })),
+          thread: threadLines,
           userMessage: text.trim(),
         }),
       });
@@ -133,11 +164,6 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
       if (!res.ok) throw new Error("Failed to get reply");
 
       const data = await res.json();
-      const COLORS: Record<string, string> = {
-        Casey: "#2dd4bf",
-        Riley: "#a78bfa",
-        Morgan: "#fb923c",
-      };
 
       const replyMsg: GroupChatMessage = {
         id: `reply-${Date.now()}`,
@@ -147,7 +173,22 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
         color: COLORS[data.sender] || "#2dd4bf",
       };
 
-      onMessagesUpdate([...updated, replyMsg]);
+      // Splice AI reply right after the user message
+      const insertPos = visibleCountRef.current;
+      setCombinedMessages((prev) => {
+        const updated = [...prev];
+        updated.splice(insertPos, 0, replyMsg);
+        return updated;
+      });
+      totalMessagesRef.current += 1;
+      setVisibleCount(insertPos + 1);
+      visibleCountRef.current = insertPos + 1;
+
+      // Sync parent state with current combined messages
+      setCombinedMessages((prev) => {
+        onMessagesUpdate(prev);
+        return prev;
+      });
     } catch {
       // silently fail — user can retry
     } finally {
@@ -234,7 +275,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
         ))}
 
         {/* Typing indicator — during reveal or API call */}
-        {((!revealDone && !isPaused && visibleCount < initialMessageCount.current) || loading) && (
+        {(isRevealing || loading) && (
           <div className="flex justify-start">
             <div className="bg-[var(--color-surface)] rounded-2xl rounded-bl-md px-4 py-3">
               <LoadingDots />
@@ -290,7 +331,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
       {/* Hint when messages are still revealing */}
       {!canInteract && (
         <p className="text-xs text-[var(--color-muted)] text-center pt-1">
-          Pause to jump in and ask questions
+          Click &quot;Jump in&quot; to pause and ask questions
         </p>
       )}
     </div>
