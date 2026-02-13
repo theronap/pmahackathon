@@ -10,7 +10,7 @@ const MODE_OPTIONS: { value: LearningMode; label: string; description: string; r
   { value: "story", label: "Story", description: "Text as a natural conversation" },
   { value: "focus", label: "Focus", description: "Bionic reading for fast scanning" },
   { value: "quiz", label: "Quiz", description: "Quiz yourself on the content" },
-  { value: "rsvp", label: "RSVP", description: "One word at a time" },
+  { value: "rsvp", label: "Rapid Serial Visual Presentation", description: "One word at a time, a.k.a. RSVP" },
   { value: "plain", label: "Plain", description: "Clean, styled paragraphs" },
 ];
 
