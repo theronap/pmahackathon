@@ -163,7 +163,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
           {!revealDone && !isPaused && (
             <button
               onClick={handlePause}
-              className="px-4 py-1.5 text-xs rounded-lg bg-teal-500/20 text-teal-300 border border-teal-400/40 hover:bg-teal-500/30 transition-all cursor-pointer font-medium flex items-center gap-1.5"
+              className="px-4 py-1.5 text-xs rounded-lg bg-brand-500/20 text-brand-300 border border-brand-400/40 hover:bg-brand-500/30 transition-all cursor-pointer font-medium flex items-center gap-1.5"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
@@ -199,7 +199,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
               onClick={() => setSpeed(opt.value)}
               className={`px-2 py-1 text-[11px] rounded-md transition-all cursor-pointer ${
                 speed === opt.value
-                  ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                  ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
                   : "bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-400"
               }`}
             >
@@ -274,12 +274,12 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
               }}
               placeholder="Ask a question or dive deeper..."
               disabled={loading}
-              className="flex-1 bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50 disabled:opacity-50"
+              className="flex-1 bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50 disabled:opacity-50"
             />
             <button
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || loading}
-              className="px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-4 py-2.5 bg-brand-500 hover:bg-brand-400 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Send
             </button>

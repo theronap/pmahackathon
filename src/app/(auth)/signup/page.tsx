@@ -46,9 +46,9 @@ export default function SignupPage() {
   if (confirmationSent) {
     return (
       <div className="text-center">
-        <div className="h-12 w-12 rounded-full bg-teal-500/20 flex items-center justify-center mx-auto mb-4">
+        <div className="h-12 w-12 rounded-full bg-brand-500/20 flex items-center justify-center mx-auto mb-4">
           <svg
-            className="h-6 w-6 text-teal-400"
+            className="h-6 w-6 text-brand-400"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={2}
@@ -68,7 +68,7 @@ export default function SignupPage() {
         </p>
         <Link
           href="/login"
-          className="text-teal-400 hover:text-teal-300 font-medium text-sm"
+          className="text-brand-400 hover:text-brand-300 font-medium text-sm"
         >
           Back to sign in
         </Link>
@@ -99,7 +99,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="you@example.com"
           />
         </div>
@@ -118,7 +118,7 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="At least 6 characters"
           />
         </div>
@@ -138,7 +138,7 @@ export default function SignupPage() {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="text-teal-400 hover:text-teal-300 font-medium"
+          className="text-brand-400 hover:text-brand-300 font-medium"
         >
           Sign in
         </Link>

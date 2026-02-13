@@ -133,13 +133,13 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
       {/* Word display with ORP anchor */}
       <div className="w-full flex flex-col items-center justify-center min-h-[120px] mb-6 bg-gray-800/50 rounded-2xl border border-gray-700 select-none">
         {/* Fixation marker */}
-        <div className="text-teal-400 text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
+        <div className="text-brand-400 text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
         {/* Word with fixed anchor position */}
         <div className="flex justify-center text-4xl sm:text-5xl font-mono font-bold tracking-wide">
           <span className="text-right text-white" style={{ width: "12ch" }}>
             {currentWord.slice(0, getAnchorIndex(currentWord))}
           </span>
-          <span className="text-teal-400">
+          <span className="text-brand-400">
             {currentWord[getAnchorIndex(currentWord)] ?? ""}
           </span>
           <span className="text-left text-white" style={{ width: "12ch" }}>
@@ -151,7 +151,7 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
       {/* Progress bar */}
       <div className="w-full h-2 bg-gray-800 rounded-full mb-6 overflow-hidden">
         <div
-          className="h-full bg-teal-400 rounded-full transition-all duration-100"
+          className="h-full bg-brand-400 rounded-full transition-all duration-100"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -186,7 +186,7 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
       <div className="w-full max-w-xs">
         <label className="flex items-center justify-between text-sm text-gray-400 mb-2">
           <span>Speed</span>
-          <span className="font-mono text-teal-400">{wpm} WPM</span>
+          <span className="font-mono text-brand-400">{wpm} WPM</span>
         </label>
         <input
           type="range"
@@ -195,7 +195,7 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
           step={25}
           value={wpm}
           onChange={(e) => setWpm(Number(e.target.value))}
-          className="w-full accent-teal-400 cursor-pointer"
+          className="w-full accent-brand-400 cursor-pointer"
         />
         <div className="flex justify-between text-xs text-gray-600 mt-1">
           <span>100</span>

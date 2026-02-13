@@ -127,7 +127,7 @@ export function ChatBubbleRenderer({
                 onClick={() => setSpeed(opt.value)}
                 className={`px-2 py-1 text-[11px] rounded-md transition-all cursor-pointer ${
                   speed === opt.value
-                    ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
                     : "bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-400"
                 }`}
               >

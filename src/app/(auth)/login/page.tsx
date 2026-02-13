@@ -57,7 +57,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="you@example.com"
           />
         </div>
@@ -76,7 +76,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50"
+            className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50"
             placeholder="Your password"
           />
         </div>
@@ -96,7 +96,7 @@ export default function LoginPage() {
         Don&apos;t have an account?{" "}
         <Link
           href="/signup"
-          className="text-teal-400 hover:text-teal-300 font-medium"
+          className="text-brand-400 hover:text-brand-300 font-medium"
         >
           Sign up
         </Link>

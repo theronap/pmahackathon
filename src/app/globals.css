@@ -3,6 +3,10 @@
 @theme inline {
   --font-sans: var(--font-body);
   --font-display: var(--font-heading);
+  --color-brand-300: #8BD42F;
+  --color-brand-400: #73C41D;
+  --color-brand-500: #65AD19;
+  --color-brand-600: #4E8A14;
 }
 
 body {
@@ -44,8 +48,8 @@ body {
   --header-border: rgba(31, 41, 55, 0.60);
   --header-text: #9ca3af;
   --header-text-hover: #e5e7eb;
-  --header-accent: #5eead4;
-  --header-accent-bg: rgba(45, 212, 191, 0.10);
+  --header-accent: #73C41D;
+  --header-accent-bg: rgba(115, 196, 29, 0.10);
   --header-divider: rgba(31, 41, 55, 1);
 }
 
@@ -129,7 +133,7 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 18px;
   height: 18px;
-  background: #2dd4bf;
+  background: #73C41D;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid #030712;
@@ -138,7 +142,7 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background: #2dd4bf;
+  background: #73C41D;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid #030712;

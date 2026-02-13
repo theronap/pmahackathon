@@ -69,7 +69,7 @@ export function KeyTakeawaysPanel({ chunkText, demo }: KeyTakeawaysPanelProps) {
               {/* Summary */}
               {data.summary && (
                 <div>
-                  <h4 className="text-xs font-semibold text-teal-400 uppercase tracking-wider mb-1.5">
+                  <h4 className="text-xs font-semibold text-brand-400 uppercase tracking-wider mb-1.5">
                     Summary
                   </h4>
                   <p className="text-sm text-gray-300 leading-relaxed">{data.summary}</p>
@@ -79,13 +79,13 @@ export function KeyTakeawaysPanel({ chunkText, demo }: KeyTakeawaysPanelProps) {
               {/* Key Takeaways */}
               {data.takeaways.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-teal-400 uppercase tracking-wider mb-1.5">
+                  <h4 className="text-xs font-semibold text-brand-400 uppercase tracking-wider mb-1.5">
                     Key Takeaways
                   </h4>
                   <ul className="space-y-1.5">
                     {data.takeaways.map((t, i) => (
                       <li key={i} className="flex gap-2 text-sm text-gray-300">
-                        <span className="text-teal-500 mt-0.5 flex-shrink-0">&#8226;</span>
+                        <span className="text-brand-500 mt-0.5 flex-shrink-0">&#8226;</span>
                         <span className="leading-relaxed">{t}</span>
                       </li>
                     ))}
@@ -96,7 +96,7 @@ export function KeyTakeawaysPanel({ chunkText, demo }: KeyTakeawaysPanelProps) {
               {/* Definitions */}
               {data.definitions.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-teal-400 uppercase tracking-wider mb-1.5">
+                  <h4 className="text-xs font-semibold text-brand-400 uppercase tracking-wider mb-1.5">
                     Key Terms
                   </h4>
                   <dl className="space-y-2">

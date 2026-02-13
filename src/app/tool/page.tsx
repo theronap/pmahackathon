@@ -312,7 +312,7 @@ function ToolContent() {
                 onClick={() => setInputMode("paste")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   inputMode === "paste"
-                    ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
                     : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
                 }`}
               >
@@ -322,7 +322,7 @@ function ToolContent() {
                 onClick={() => setInputMode("upload")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   inputMode === "upload"
-                    ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
                     : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
                 }`}
               >
@@ -332,7 +332,7 @@ function ToolContent() {
                 onClick={() => setInputMode("record")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   inputMode === "record"
-                    ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                    ? "bg-brand-500/20 text-brand-300 border border-brand-400/40"
                     : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
                 }`}
               >
@@ -372,7 +372,7 @@ function ToolContent() {
                     : "Paste your academic text here..."
                 }
                 rows={8}
-                className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50 resize-y text-base leading-relaxed"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 focus:border-brand-400/50 resize-y text-base leading-relaxed"
               />
               <div className="flex justify-between items-center mt-2">
                 <span
@@ -383,7 +383,7 @@ function ToolContent() {
                   {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()} characters
                 </span>
                 {fileName && (
-                  <span className="text-sm text-teal-400">
+                  <span className="text-sm text-brand-400">
                     Uploaded: {fileName}
                   </span>
                 )}

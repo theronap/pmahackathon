@@ -58,7 +58,7 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
       {totalMCRevealed > 0 && (
         <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/50 border border-gray-700">
           <span className="text-sm text-gray-400">Score:</span>
-          <span className="text-lg font-bold text-teal-400">
+          <span className="text-lg font-bold text-brand-400">
             {totalCorrect}/{totalMCRevealed}
           </span>
           <span className="text-sm text-gray-500">multiple choice correct</span>
@@ -71,7 +71,7 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
           className="p-5 rounded-xl border border-gray-700 bg-gray-800/30"
         >
           <div className="flex items-start gap-3 mb-4">
-            <span className="flex-shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-full bg-teal-500/15 text-teal-400 text-sm font-bold">
+            <span className="flex-shrink-0 inline-flex items-center justify-center h-7 w-7 rounded-full bg-brand-500/15 text-brand-400 text-sm font-bold">
               {idx + 1}
             </span>
             <div>
@@ -95,7 +95,7 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
                 } else if (isRevealed && isSelected && !isCorrect) {
                   optionStyle = "border-red-500/50 bg-red-500/10";
                 } else if (isSelected) {
-                  optionStyle = "border-teal-400/50 bg-teal-400/10";
+                  optionStyle = "border-brand-400/50 bg-brand-400/10";
                 }
 
                 return (
@@ -133,11 +133,11 @@ export function QuizRenderer({ questions }: QuizRendererProps) {
                 placeholder="Type your answer..."
                 rows={3}
                 disabled={revealed[idx]}
-                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 text-sm resize-none disabled:opacity-60"
+                className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-400/50 text-sm resize-none disabled:opacity-60"
               />
               {revealed[idx] && q.sampleAnswer && (
-                <div className="mt-2 p-3 rounded-lg bg-teal-500/10 border border-teal-500/20">
-                  <span className="text-xs font-medium text-teal-400">Sample Answer:</span>
+                <div className="mt-2 p-3 rounded-lg bg-brand-500/10 border border-brand-500/20">
+                  <span className="text-xs font-medium text-brand-400">Sample Answer:</span>
                   <p className="text-sm text-gray-200 mt-1">{q.sampleAnswer}</p>
                 </div>
               )}
