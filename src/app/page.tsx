@@ -87,7 +87,7 @@ export default function HomePage() {
             back in formats designed to reduce cognitive load for students with
             ADHD.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-row items-center justify-center gap-4">
             <Link
               href="/tool"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 hover:bg-teal-400 text-white font-semibold rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 text-lg"
