@@ -7,10 +7,10 @@ import type { LearningMode, TimePreference, GoalPreference, SetupConfig, TextChu
 import { estimateReadingTime } from "@/lib/chunker";
 
 const MODE_OPTIONS: { value: LearningMode; label: string; description: string; recommended?: boolean }[] = [
-  { value: "focus", label: "Focus", description: "Bionic reading for fast scanning", recommended: true },
+  { value: "groupchat", label: "Group Chat", description: "Friends discuss the material", recommended: true },
   { value: "story", label: "Story", description: "Text as a natural conversation" },
+  { value: "focus", label: "Focus", description: "Bionic reading for fast scanning" },
   { value: "game", label: "Game", description: "Quiz yourself on the content" },
-  { value: "groupchat", label: "Group Chat", description: "Friends discuss the material" },
   { value: "rsvp", label: "RSVP", description: "One word at a time" },
   { value: "plain", label: "Plain", description: "Clean, styled paragraphs" },
 ];
@@ -35,7 +35,7 @@ interface SetupScreenProps {
 }
 
 export function SetupScreen({ chunks, onContinue, onBack }: SetupScreenProps) {
-  const [mode, setMode] = useState<LearningMode>("focus");
+  const [mode, setMode] = useState<LearningMode>("groupchat");
   const [time, setTime] = useState<TimePreference | null>(null);
   const [goal, setGoal] = useState<GoalPreference | null>(null);
 

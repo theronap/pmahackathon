@@ -8,7 +8,7 @@ import type { ConversationStyle, QuizResult, GroupChatResult, ReformatRequest } 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { text, format, conversationStyle = "tutor", demo } = body as ReformatRequest & { demo?: boolean };
+    const { text, format, conversationStyle = "tutor", demo, useGenerate } = body as ReformatRequest & { demo?: boolean; useGenerate?: boolean };
 
     // Auth check (skip for demo)
     if (!demo) {
@@ -40,6 +40,29 @@ export async function POST(request: Request) {
       const style: ConversationStyle =
         conversationStyle === "study-group" ? "study-group" : "tutor";
 
+      // Non-streaming mode for progressive reveal
+      if (useGenerate) {
+        const { text: responseText } = await generateText({
+          model: getModel(),
+          system: getSystemPrompt("conversation", style),
+          prompt: getUserPrompt("conversation", text),
+          maxOutputTokens: 4096,
+          temperature: 0.7,
+        });
+
+        let jsonStr = responseText.trim();
+        if (jsonStr.startsWith("```")) {
+          jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
+        }
+
+        const parsed = JSON.parse(jsonStr);
+        return NextResponse.json({
+          speakers: parsed.speakers,
+          dialogue: parsed.dialogue,
+        });
+      }
+
+      // Streaming mode (legacy)
       const result = streamText({
         model: getModel(),
         system: getSystemPrompt("conversation", style),

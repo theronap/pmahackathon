@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { LoadingDots } from "@/components/ui/loading";
 import type { GroupChatMessage } from "@/types";
 
@@ -8,6 +8,13 @@ const QUICK_REPLIES = [
   "Got it",
   "Can you explain that?",
   "What's the main point?",
+  "Give me a real-world example",
+];
+
+const SPEED_OPTIONS = [
+  { label: "Slow", value: 4000 },
+  { label: "Normal", value: 2000 },
+  { label: "Fast", value: 800 },
 ];
 
 interface GroupChatRendererProps {
@@ -19,6 +26,82 @@ interface GroupChatRendererProps {
 export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: GroupChatRendererProps) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [speed, setSpeed] = useState(2000);
+  const [revealDone, setRevealDone] = useState(false);
+
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Count only the initial AI messages (not user-added ones)
+  const initialMessageCount = useRef(messages.length);
+  useEffect(() => {
+    // Reset on fresh set of messages (new chunk)
+    if (messages.length > 0 && messages.every((m) => !m.isUser)) {
+      initialMessageCount.current = messages.length;
+      setVisibleCount(0);
+      setRevealDone(false);
+      setIsPaused(false);
+    }
+  }, [messages.length, messages]);
+
+  // Progressive reveal timer
+  const revealNext = useCallback(() => {
+    setVisibleCount((prev) => {
+      const next = prev + 1;
+      if (next >= initialMessageCount.current) {
+        setRevealDone(true);
+        return initialMessageCount.current;
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || revealDone) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      return;
+    }
+
+    if (visibleCount < initialMessageCount.current) {
+      timerRef.current = setTimeout(revealNext, speed);
+    }
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [visibleCount, isPaused, revealDone, speed, revealNext]);
+
+  // Auto-scroll to bottom when new messages appear
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [visibleCount, messages.length]);
+
+  // Show initial messages (up to visibleCount) plus any user-added messages
+  const visibleMessages = [
+    ...messages.slice(0, visibleCount),
+    ...messages.slice(initialMessageCount.current),
+  ];
+
+  const canInteract = isPaused || revealDone;
+
+  function handlePause() {
+    setIsPaused(true);
+  }
+
+  function handleResume() {
+    if (revealDone) return;
+    setIsPaused(false);
+  }
+
+  function handleShowAll() {
+    setVisibleCount(initialMessageCount.current);
+    setRevealDone(true);
+    setIsPaused(false);
+  }
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -42,7 +125,7 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chunk: chunkText,
-          thread: updated.slice(-10).map((m) => ({ sender: m.sender, text: m.text })),
+          thread: visibleMessages.concat(userMsg).slice(-10).map((m) => ({ sender: m.sender, text: m.text })),
           userMessage: text.trim(),
         }),
       });
@@ -74,12 +157,62 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
 
   return (
     <div className="space-y-3">
+      {/* Controls bar */}
+      <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-800">
+        <div className="flex items-center gap-2">
+          {!revealDone && (
+            <button
+              onClick={isPaused ? handleResume : handlePause}
+              className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              {isPaused ? (
+                <>
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Resume
+                </>
+              ) : (
+                <>
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  Pause
+                </>
+              )}
+            </button>
+          )}
+          {!revealDone && (
+            <button
+              onClick={handleShowAll}
+              className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300 transition-all cursor-pointer"
+            >
+              Show all
+            </button>
+          )}
+        </div>
+
+        {/* Speed control */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-gray-500">Speed:</span>
+          {SPEED_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setSpeed(opt.value)}
+              className={`px-2 py-1 text-[11px] rounded-md transition-all cursor-pointer ${
+                speed === opt.value
+                  ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                  : "bg-gray-800 text-gray-500 border border-gray-700 hover:text-gray-400"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Message thread */}
-      <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-        {messages.map((msg) => (
+      <div ref={scrollRef} className="space-y-3 max-h-[55vh] overflow-y-auto pr-2">
+        {visibleMessages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}
+            className={`flex ${msg.isUser ? "justify-end" : "justify-start"} animate-[fadeIn_0.3s_ease-out]`}
           >
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
@@ -98,8 +231,8 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
           </div>
         ))}
 
-        {/* Typing indicator */}
-        {loading && (
+        {/* Typing indicator — during reveal or API call */}
+        {((!revealDone && !isPaused && visibleCount < initialMessageCount.current) || loading) && (
           <div className="flex justify-start">
             <div className="bg-gray-800/80 rounded-2xl rounded-bl-md px-4 py-3">
               <LoadingDots />
@@ -108,44 +241,56 @@ export function GroupChatRenderer({ messages, chunkText, onMessagesUpdate }: Gro
         )}
       </div>
 
-      {/* Quick replies */}
-      <div className="flex flex-wrap gap-2 pt-2">
-        {QUICK_REPLIES.map((reply) => (
-          <button
-            key={reply}
-            onClick={() => sendMessage(reply)}
-            disabled={loading}
-            className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300 hover:border-gray-600 transition-all cursor-pointer disabled:opacity-50"
-          >
-            {reply}
-          </button>
-        ))}
-      </div>
+      {/* Interaction area — visible when paused or reveal done */}
+      {canInteract && (
+        <>
+          {/* Quick replies */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            {QUICK_REPLIES.map((reply) => (
+              <button
+                key={reply}
+                onClick={() => sendMessage(reply)}
+                disabled={loading}
+                className="px-3 py-1.5 text-xs rounded-lg bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300 hover:border-gray-600 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {reply}
+              </button>
+            ))}
+          </div>
 
-      {/* Text input */}
-      <div className="flex gap-2 pt-1">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage(input);
-            }
-          }}
-          placeholder="Type a message..."
-          disabled={loading}
-          className="flex-1 bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50 disabled:opacity-50"
-        />
-        <button
-          onClick={() => sendMessage(input)}
-          disabled={!input.trim() || loading}
-          className="px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        >
-          Send
-        </button>
-      </div>
+          {/* Text input */}
+          <div className="flex gap-2 pt-1">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage(input);
+                }
+              }}
+              placeholder="Ask a question or dive deeper..."
+              disabled={loading}
+              className="flex-1 bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-teal-400/50 disabled:opacity-50"
+            />
+            <button
+              onClick={() => sendMessage(input)}
+              disabled={!input.trim() || loading}
+              className="px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Send
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Hint when messages are still revealing */}
+      {!canInteract && (
+        <p className="text-xs text-gray-500 text-center pt-1">
+          Pause to jump in and ask questions
+        </p>
+      )}
     </div>
   );
 }

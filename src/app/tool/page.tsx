@@ -11,11 +11,12 @@ import { RSVPPlayer } from "@/components/renderers/rsvp-player";
 import { QuizRenderer } from "@/components/renderers/quiz-renderer";
 import { GroupChatRenderer } from "@/components/renderers/group-chat-renderer";
 import { FileUpload } from "@/components/file-upload";
+import { VoiceRecorder } from "@/components/voice-recorder";
 import { SetupScreen } from "@/components/setup-screen";
 import { ProgressBar } from "@/components/progress-bar";
 import { CompletionScreen } from "@/components/completion-screen";
+import { KeyTakeawaysPanel } from "@/components/key-takeaways-panel";
 import { textToBionic } from "@/lib/bionic";
-import { parsePartialConversation } from "@/lib/stream-parser";
 import { chunkText } from "@/lib/chunker";
 import { SAMPLE_READING } from "@/lib/sample-text";
 import { createClient } from "@/lib/supabase/client";
@@ -36,7 +37,7 @@ import type {
 const MAX_CHARS = 15000;
 
 type ViewState = "input" | "setup" | "reading" | "done";
-type InputMode = "paste" | "upload";
+type InputMode = "paste" | "upload" | "record";
 
 function ToolContent() {
   const searchParams = useSearchParams();
@@ -61,16 +62,12 @@ function ToolContent() {
   const [result, setResult] = useState<ReformatResult | GroupChatResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [streaming, setStreaming] = useState(false);
-  const [streamedResult, setStreamedResult] = useState<ConversationResult | null>(null);
   const [groupChatMessages, setGroupChatMessages] = useState<GroupChatMessage[]>([]);
 
   // Preferences
   const [conversationStyle, setConversationStyle] = useState<ConversationStyle>("tutor");
   const [showTypingIndicator, setShowTypingIndicator] = useState(true);
   const [ready, setReady] = useState(false);
-
-  const abortRef = useRef<AbortController | null>(null);
 
   const charCount = inputText.length;
   const isOverLimit = charCount > MAX_CHARS;
@@ -144,7 +141,6 @@ function ToolContent() {
   const processChunk = useCallback(async (chunk: TextChunk, config: SetupConfig) => {
     setError(null);
     setResult(null);
-    setStreamedResult(null);
     setGroupChatMessages([]);
 
     const mode = config.mode;
@@ -175,14 +171,9 @@ function ToolContent() {
       return;
     }
 
-    // Story mode: conversation (streaming)
+    // Story mode: conversation (non-streaming, progressive reveal in renderer)
     if (mode === "story") {
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      setStreaming(true);
-      setStreamedResult(null);
-
+      setLoading(true);
       try {
         const res = await fetch("/api/reformat", {
           method: "POST",
@@ -191,9 +182,9 @@ function ToolContent() {
             text: chunk.text,
             format: "conversation",
             conversationStyle,
+            useGenerate: true,
             ...(isDemo && { demo: true }),
           }),
-          signal: controller.signal,
         });
 
         if (!res.ok) {
@@ -201,40 +192,20 @@ function ToolContent() {
           throw new Error(data.error || "Something went wrong.");
         }
 
-        const reader = res.body!.getReader();
-        const decoder = new TextDecoder();
-        let accumulated = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          accumulated += decoder.decode(value, { stream: true });
-          const partial = parsePartialConversation(accumulated, conversationStyle);
-          if (partial) setStreamedResult(partial);
-        }
-
-        let jsonStr = accumulated.trim();
-        if (jsonStr.startsWith("```")) {
-          jsonStr = jsonStr.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
-        }
-
-        const parsed = JSON.parse(jsonStr);
+        const data = await res.json();
         const finalResult: ConversationResult = {
           format: "conversation",
           style: conversationStyle,
-          speakers: parsed.speakers,
-          dialogue: parsed.dialogue,
+          speakers: data.speakers,
+          dialogue: data.dialogue,
         };
 
         setResult(finalResult);
-        setStreamedResult(null);
-        setStreaming(false);
         await saveResultToDb(finalResult, chunk.text);
       } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") return;
         setError(err instanceof Error ? err.message : "Something went wrong.");
-        setStreaming(false);
-        setStreamedResult(null);
+      } finally {
+        setLoading(false);
       }
       return;
     }
@@ -353,11 +324,10 @@ function ToolContent() {
   }
 
   const currentChunk = chunks[currentChunkIndex];
-  const displayConversation = streaming ? streamedResult : (result?.format === "conversation" ? result : null);
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+      <div className={`${view === "reading" ? "max-w-6xl" : "max-w-4xl"} mx-auto px-4 py-8 sm:py-12 transition-all`}>
 
         {/* ========== INPUT VIEW ========== */}
         {view === "input" && (
@@ -391,7 +361,24 @@ function ToolContent() {
               >
                 Upload File
               </button>
+              <button
+                onClick={() => setInputMode("record")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                  inputMode === "record"
+                    ? "bg-teal-500/20 text-teal-300 border border-teal-400/40"
+                    : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-gray-300"
+                }`}
+              >
+                Record Audio
+              </button>
             </div>
+
+            {/* Voice recorder */}
+            {inputMode === "record" && (
+              <Card className="p-6 mb-4">
+                <VoiceRecorder onTranscript={(text) => setInputText((prev) => prev ? prev + "\n\n" + text : text)} />
+              </Card>
+            )}
 
             {/* Text input */}
             <Card className="p-6 mb-6">
@@ -411,7 +398,9 @@ function ToolContent() {
                   }
                 }}
                 placeholder={
-                  inputMode === "upload"
+                  inputMode === "record"
+                    ? "Transcript will appear here, or you can edit it..."
+                    : inputMode === "upload"
                     ? "File text will appear here, or you can edit it..."
                     : "Paste your academic text here..."
                 }
@@ -470,75 +459,69 @@ function ToolContent() {
             )}
 
             {/* Loading state */}
-            {(loading || (streaming && !streamedResult && !displayConversation)) && (
+            {loading && (
               <Card className="p-8 mb-6">
                 <div className="flex items-center justify-center gap-3">
                   <LoadingDots />
-                  <span className="text-gray-400 text-sm">
-                    {streaming ? "Streaming..." : "Generating..."}
-                  </span>
+                  <span className="text-gray-400 text-sm">Generating...</span>
                 </div>
               </Card>
             )}
 
-            {/* Streaming conversation output (story mode) */}
-            {streaming && displayConversation && (
-              <Card className="p-6 mb-6" glow>
-                <ChatBubbleRenderer
-                  speakers={displayConversation.speakers}
-                  dialogue={displayConversation.dialogue}
-                  isStreaming={true}
-                  showTypingIndicator={showTypingIndicator}
-                />
-              </Card>
-            )}
+            {/* Content + side panel grid */}
+            {!loading && result && (
+              <div className={`${setupConfig.mode !== "game" ? "grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4" : ""} mb-6`}>
+                <Card className="p-6" glow>
+                  {/* Focus mode: bionic */}
+                  {setupConfig.mode === "focus" && result.format === "bionic" && (
+                    <BionicTextRenderer paragraphs={result.paragraphs} />
+                  )}
 
-            {/* Final rendered content */}
-            {!loading && !streaming && result && (
-              <Card className="p-6 mb-6" glow>
-                {/* Focus mode: bionic */}
-                {setupConfig.mode === "focus" && result.format === "bionic" && (
-                  <BionicTextRenderer paragraphs={result.paragraphs} />
-                )}
+                  {/* Story mode: conversation with progressive reveal */}
+                  {setupConfig.mode === "story" && result.format === "conversation" && (
+                    <ChatBubbleRenderer
+                      speakers={result.speakers}
+                      dialogue={result.dialogue}
+                      progressiveReveal
+                    />
+                  )}
 
-                {/* Story mode: conversation */}
-                {setupConfig.mode === "story" && result.format === "conversation" && (
-                  <ChatBubbleRenderer
-                    speakers={result.speakers}
-                    dialogue={result.dialogue}
-                  />
-                )}
+                  {/* Game mode: quiz */}
+                  {setupConfig.mode === "game" && result.format === "quiz" && (
+                    <QuizRenderer questions={result.questions} />
+                  )}
 
-                {/* Game mode: quiz */}
-                {setupConfig.mode === "game" && result.format === "quiz" && (
-                  <QuizRenderer questions={result.questions} />
-                )}
+                  {/* Group chat mode */}
+                  {setupConfig.mode === "groupchat" && groupChatMessages.length > 0 && (
+                    <GroupChatRenderer
+                      messages={groupChatMessages}
+                      chunkText={currentChunk.text}
+                      onMessagesUpdate={setGroupChatMessages}
+                    />
+                  )}
 
-                {/* Group chat mode */}
-                {setupConfig.mode === "groupchat" && groupChatMessages.length > 0 && (
-                  <GroupChatRenderer
-                    messages={groupChatMessages}
-                    chunkText={currentChunk.text}
-                    onMessagesUpdate={setGroupChatMessages}
-                  />
-                )}
+                  {/* RSVP mode */}
+                  {setupConfig.mode === "rsvp" && result.format === "rsvp" && (
+                    <RSVPPlayer words={result.words} />
+                  )}
 
-                {/* RSVP mode */}
-                {setupConfig.mode === "rsvp" && result.format === "rsvp" && (
-                  <RSVPPlayer words={result.words} />
-                )}
+                  {/* Plain mode */}
+                  {setupConfig.mode === "plain" && (
+                    <div className="prose prose-invert max-w-none">
+                      {currentChunk.text.split(/\n\s*\n/).map((para, i) => (
+                        <p key={i} className="text-gray-200 leading-relaxed mb-4">
+                          {para}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </Card>
 
-                {/* Plain mode */}
-                {setupConfig.mode === "plain" && (
-                  <div className="prose prose-invert max-w-none">
-                    {currentChunk.text.split(/\n\s*\n/).map((para, i) => (
-                      <p key={i} className="text-gray-200 leading-relaxed mb-4">
-                        {para}
-                      </p>
-                    ))}
-                  </div>
+                {/* Key Takeaways side panel — all modes except quiz */}
+                {setupConfig.mode !== "game" && (
+                  <KeyTakeawaysPanel chunkText={currentChunk.text} demo={isDemo} />
                 )}
-              </Card>
+              </div>
             )}
 
             {/* Navigation */}
@@ -546,13 +529,13 @@ function ToolContent() {
               <Button
                 variant="secondary"
                 onClick={handlePrevChunk}
-                disabled={currentChunkIndex === 0 || loading || streaming}
+                disabled={currentChunkIndex === 0 || loading}
               >
                 Previous Chunk
               </Button>
               <Button
                 onClick={handleNextChunk}
-                disabled={loading || streaming}
+                disabled={loading}
               >
                 {currentChunkIndex === chunks.length - 1 ? "Finish" : "Next Chunk"}
               </Button>

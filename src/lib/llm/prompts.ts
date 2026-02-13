@@ -133,3 +133,22 @@ export function getUserPrompt(format: OutputFormat, text: string): string {
 export function getGroupChatReplySystemPrompt(): string {
   return GROUP_CHAT_REPLY_SYSTEM;
 }
+
+const KEY_TAKEAWAYS_SYSTEM = `You extract study notes from academic text. Be concise and student-friendly.
+
+Return ONLY valid JSON in this exact format (no markdown, no code fences):
+{
+  "takeaways": ["key point 1", "key point 2", "key point 3"],
+  "definitions": [{ "term": "...", "definition": "..." }],
+  "summary": "A 1-2 sentence summary of the passage."
+}
+
+Rules:
+- 3-5 key takeaways, each one sentence
+- Only include definitions for technical or domain-specific terms actually used in the text (0-4 terms)
+- Summary should be 1-2 sentences max
+- Use plain language a student would understand`;
+
+export function getKeyTakeawaysSystemPrompt(): string {
+  return KEY_TAKEAWAYS_SYSTEM;
+}
