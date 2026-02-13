@@ -70,7 +70,7 @@ export function Header() {
           </div>
           <span
             className="font-bold text-lg transition-colors"
-            style={{ color: "#fff" }}
+            style={{ color: "var(--header-text-hover)" }}
           >
             teachMe
           </span>
