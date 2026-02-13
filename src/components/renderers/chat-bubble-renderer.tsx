@@ -12,9 +12,9 @@ const QUICK_REPLIES = [
 ];
 
 const SPEED_OPTIONS = [
-  { label: "Slow", value: 3500 },
-  { label: "Normal", value: 1800 },
-  { label: "Fast", value: 700 },
+  { label: "Slow", value: 5500 },
+  { label: "Normal", value: 3500 },
+  { label: "Fast", value: 1200 },
 ];
 
 interface ChatBubbleRendererProps {
@@ -44,7 +44,7 @@ export function ChatBubbleRenderer({
   const [visibleCount, setVisibleCount] = useState(progressiveReveal ? 0 : dialogue.length);
   const visibleCountRef = useRef(visibleCount);
   const [isPaused, setIsPaused] = useState(false);
-  const [speed, setSpeed] = useState(1800);
+  const [speed, setSpeed] = useState(3500);
   const [revealDone, setRevealDone] = useState(!progressiveReveal);
 
   // Interaction state
