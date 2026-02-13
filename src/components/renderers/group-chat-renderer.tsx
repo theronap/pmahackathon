@@ -12,9 +12,9 @@ const QUICK_REPLIES = [
 ];
 
 const SPEED_OPTIONS = [
-  { label: "Slow", value: 5000 },
-  { label: "Normal", value: 3000 },
-  { label: "Fast", value: 1000 },
+  { label: "Slow", value: 5500 },
+  { label: "Normal", value: 3500 },
+  { label: "Fast", value: 1200 },
 ];
 
 const COLORS: Record<string, string> = {
