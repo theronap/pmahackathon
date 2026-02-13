@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Instrument_Serif, DM_Sans } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-heading",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
@@ -21,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased bg-gray-950 text-gray-100`}>
+      <body className={`${instrumentSerif.variable} ${dmSans.variable} font-sans antialiased bg-gray-950 text-gray-100`}>
         <Header />
         {children}
       </body>

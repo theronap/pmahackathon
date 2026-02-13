@@ -1,12 +1,75 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
 }
 
 body {
   background: #030712;
   color: #f3f4f6;
+}
+
+/* ── Landing page theme ── */
+.theme-landing {
+  --header-bg: rgba(10, 22, 40, 0.80);
+  --header-border: rgba(30, 58, 100, 0.40);
+  --header-text: #b8c4da;
+  --header-text-hover: #e2e8f4;
+  --header-accent: #fb923c;
+  --header-accent-bg: rgba(251, 146, 60, 0.10);
+  --header-divider: rgba(30, 58, 100, 0.50);
+}
+
+.theme-tool {
+  --header-bg: rgba(3, 7, 18, 0.80);
+  --header-border: rgba(31, 41, 55, 0.60);
+  --header-text: #9ca3af;
+  --header-text-hover: #e5e7eb;
+  --header-accent: #5eead4;
+  --header-accent-bg: rgba(45, 212, 191, 0.10);
+  --header-divider: rgba(31, 41, 55, 1);
+}
+
+/* ── Breathing glow for hero ── */
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.05); }
+}
+
+.hero-glow {
+  animation: breathe 6s ease-in-out infinite;
+}
+
+/* ── Scroll reveal system ── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+[data-reveal][data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal][data-delay="100"] { transition-delay: 100ms; }
+[data-reveal][data-delay="200"] { transition-delay: 200ms; }
+[data-reveal][data-delay="300"] { transition-delay: 300ms; }
+[data-reveal][data-delay="400"] { transition-delay: 400ms; }
+[data-reveal][data-delay="500"] { transition-delay: 500ms; }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero-glow {
+    animation: none;
+    opacity: 0.35;
+  }
 }
 
 /* Custom scrollbar */

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -11,6 +10,8 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const isLanding = pathname === "/";
+  const themeClass = isLanding ? "theme-landing" : "theme-tool";
 
   useEffect(() => {
     const supabase = createClient();
@@ -35,13 +36,26 @@ export function Header() {
     router.refresh();
   }
 
+  const isActive = (path: string) => pathname === path;
+
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-xl">
+    <header
+      className={`sticky top-0 z-50 backdrop-blur-xl ${themeClass}`}
+      style={{
+        backgroundColor: "var(--header-bg)",
+        borderBottom: "1px solid var(--header-border)",
+        transition: "background-color 0.3s, border-color 0.3s",
+      }}
+    >
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="h-7 w-7 rounded-lg bg-teal-500/20 flex items-center justify-center">
+          <div
+            className="h-7 w-7 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: "var(--header-accent-bg)" }}
+          >
             <svg
-              className="h-4 w-4 text-teal-400"
+              className="h-4 w-4"
+              style={{ color: "var(--header-accent)" }}
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
@@ -54,7 +68,10 @@ export function Header() {
               />
             </svg>
           </div>
-          <span className="font-bold text-white text-lg group-hover:text-teal-300 transition-colors">
+          <span
+            className="font-bold text-lg transition-colors"
+            style={{ color: "#fff" }}
+          >
             teachMe
           </span>
         </Link>
@@ -62,35 +79,42 @@ export function Header() {
         <nav className="flex items-center gap-1">
           <Link
             href="/"
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              pathname === "/"
-                ? "text-teal-300 bg-teal-400/10"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            )}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+            style={
+              isActive("/")
+                ? { color: "var(--header-accent)", backgroundColor: "var(--header-accent-bg)" }
+                : { color: "var(--header-text)" }
+            }
           >
             Home
           </Link>
           <Link
             href="/tool"
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
-              pathname === "/tool"
-                ? "text-teal-300 bg-teal-400/10"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            )}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+            style={
+              isActive("/tool")
+                ? { color: "var(--header-accent)", backgroundColor: "var(--header-accent-bg)" }
+                : { color: "var(--header-text)" }
+            }
           >
             Tool
           </Link>
 
           {user ? (
-            <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-800">
-              <span className="text-sm text-gray-400 hidden sm:inline truncate max-w-[160px]">
+            <div
+              className="flex items-center gap-2 ml-2 pl-2"
+              style={{ borderLeft: "1px solid var(--header-divider)" }}
+            >
+              <span
+                className="text-sm hidden sm:inline truncate max-w-[160px]"
+                style={{ color: "var(--header-text)" }}
+              >
                 {user.email}
               </span>
               <button
                 onClick={handleSignOut}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                style={{ color: "var(--header-text)" }}
               >
                 Sign Out
               </button>
@@ -98,12 +122,13 @@ export function Header() {
           ) : (
             <Link
               href="/login"
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ml-2 pl-2 border-l border-gray-800",
-                pathname === "/login"
-                  ? "text-teal-300 bg-teal-400/10"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-              )}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ml-2 pl-2"
+              style={{
+                borderLeft: "1px solid var(--header-divider)",
+                ...(isActive("/login")
+                  ? { color: "var(--header-accent)", backgroundColor: "var(--header-accent-bg)" }
+                  : { color: "var(--header-text)" }),
+              }}
             >
               Log In
             </Link>

@@ -1,96 +1,180 @@
 import Link from "next/link";
+import { Reveal } from "@/components/landing/reveal";
 
-const FORMATS = [
+const UNIVERSITIES = ["Stanford", "MIT", "UCLA", "NYU", "Georgia Tech", "UMich"];
+
+const FEATURES = [
   {
-    title: "Conversation Mode",
-    description:
-      "Dense paragraphs become a natural dialogue between a tutor and student, or a study group. Concepts click when you hear them explained like a real conversation.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-      </svg>
+    eyebrow: "Conversation Mode",
+    title: "Learn through dialogue",
+    body: "Dense paragraphs become a natural back-and-forth between a tutor and student. Concepts click when you hear them explained like a real conversation.",
+    align: "left" as const,
+    mockup: (
+      <div className="space-y-3">
+        <div className="flex gap-3 items-start">
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[#1e3a64] flex items-center justify-center text-xs font-bold text-[#b8c4da]">T</div>
+          <div className="rounded-2xl rounded-tl-sm bg-[#162340] border border-[#1e3a64] px-4 py-3 text-sm text-[#b8c4da] leading-relaxed max-w-[280px]">
+            Think of mitochondria as tiny power plants inside your cells. What do power plants produce?
+          </div>
+        </div>
+        <div className="flex gap-3 items-start justify-end">
+          <div className="rounded-2xl rounded-tr-sm bg-[#1a2a4a] border border-[#243656] px-4 py-3 text-sm text-[#e2e8f4] leading-relaxed max-w-[280px]">
+            Energy! So mitochondria make energy for the cell?
+          </div>
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[#2a1a0a] flex items-center justify-center text-xs font-bold text-[#fb923c]">S</div>
+        </div>
+        <div className="flex gap-3 items-start">
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[#1e3a64] flex items-center justify-center text-xs font-bold text-[#b8c4da]">T</div>
+          <div className="rounded-2xl rounded-tl-sm bg-[#162340] border border-[#1e3a64] px-4 py-3 text-sm text-[#b8c4da] leading-relaxed max-w-[280px]">
+            Exactly! They convert glucose into ATP — the energy currency your cells spend.
+          </div>
+        </div>
+      </div>
     ),
-    tag: "AI-powered",
   },
   {
-    title: "Bionic Reading",
-    description:
-      "The first few letters of each word are bolded, creating visual anchors that guide your eyes through the text faster. Your brain fills in the rest.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.64 0 8.577 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.007-9.963-7.178z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
+    eyebrow: "Bionic Reading",
+    title: "Your eyes find the rhythm",
+    body: "The first few letters of each word are bolded, creating visual anchors that guide your eyes through text faster. Your brain fills in the rest automatically.",
+    align: "right" as const,
+    mockup: (
+      <div className="space-y-3 text-[15px] leading-relaxed text-[#8494b2]">
+        <p>
+          <span className="font-bold text-[#e2e8f4]">The</span> mitochon<span className="font-bold text-[#e2e8f4]">dria</span> is{" "}
+          <span className="font-bold text-[#e2e8f4]">a</span> membrane-bou<span className="font-bold text-[#e2e8f4]">nd</span>{" "}
+          <span className="font-bold text-[#e2e8f4]">org</span>anelle{" "}
+          <span className="font-bold text-[#e2e8f4]">fou</span>nd in{" "}
+          <span className="font-bold text-[#e2e8f4]">the</span> cytop<span className="font-bold text-[#e2e8f4]">lasm</span> of{" "}
+          <span className="font-bold text-[#e2e8f4]">euk</span>aryotic{" "}
+          <span className="font-bold text-[#e2e8f4]">cel</span>ls.
+        </p>
+        <p>
+          <span className="font-bold text-[#e2e8f4]">It</span> gene<span className="font-bold text-[#e2e8f4]">rates</span>{" "}
+          <span className="font-bold text-[#e2e8f4]">mo</span>st of{" "}
+          <span className="font-bold text-[#e2e8f4]">the</span> cell&apos;s{" "}
+          <span className="font-bold text-[#e2e8f4]">sup</span>ply of{" "}
+          <span className="font-bold text-[#e2e8f4]">ade</span>nosine{" "}
+          <span className="font-bold text-[#e2e8f4]">tri</span>phosphate,{" "}
+          <span className="font-bold text-[#e2e8f4]">us</span>ed as{" "}
+          <span className="font-bold text-[#e2e8f4]">a</span> source{" "}
+          <span className="font-bold text-[#e2e8f4]">of</span> chemical{" "}
+          <span className="font-bold text-[#e2e8f4]">ene</span>rgy.
+        </p>
+      </div>
     ),
-    tag: "Instant",
   },
   {
-    title: "RSVP Reader",
-    description:
-      "Words appear one at a time at a pace you control. Eliminates the overwhelm of a wall of text and keeps your focus locked in.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-      </svg>
+    eyebrow: "Quiz Mode",
+    title: "Test what you actually know",
+    body: "Auto-generated questions with instant feedback and explanations. Find the gaps in your understanding before the exam does.",
+    align: "left" as const,
+    mockup: (
+      <div className="space-y-3">
+        <div className="text-xs font-medium text-[#fb923c] mb-1">Question 1 of 5</div>
+        <p className="text-sm text-[#e2e8f4] font-medium leading-relaxed">
+          What is the primary function of mitochondria in eukaryotic cells?
+        </p>
+        <div className="space-y-2 pt-1">
+          {["Protein synthesis", "ATP production", "DNA replication", "Cell division"].map((opt, i) => (
+            <div
+              key={opt}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border"
+              style={{
+                borderColor: i === 1 ? "#22c55e" : "#1e3a64",
+                backgroundColor: i === 1 ? "rgba(34,197,94,0.08)" : "#162340",
+                color: i === 1 ? "#4ade80" : "#b8c4da",
+              }}
+            >
+              <div
+                className="h-5 w-5 shrink-0 rounded-full border-2 flex items-center justify-center text-[10px] font-bold"
+                style={{
+                  borderColor: i === 1 ? "#22c55e" : "#2a3f62",
+                  color: i === 1 ? "#22c55e" : "#8494b2",
+                }}
+              >
+                {String.fromCharCode(65 + i)}
+              </div>
+              {opt}
+            </div>
+          ))}
+        </div>
+      </div>
     ),
-    tag: "Instant",
   },
   {
-    title: "Quiz Mode",
-    description:
-      "Auto-generated multiple choice and short answer questions to test your understanding. Get instant feedback with explanations.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-      </svg>
+    eyebrow: "RSVP Reader",
+    title: "One word at a time",
+    body: "Words appear at a pace you control, eliminating the overwhelm of a wall of text. Keeps your focus locked in without distractions.",
+    align: "right" as const,
+    mockup: (
+      <div className="flex flex-col items-center justify-center py-6">
+        <div className="text-xs text-[#8494b2] mb-4 tracking-wide uppercase">280 WPM</div>
+        <div className="text-4xl font-display font-normal text-[#e2e8f4] tracking-tight">
+          mitochondria
+        </div>
+        <div className="flex items-center gap-4 mt-6">
+          <div className="h-8 w-8 rounded-full border border-[#1e3a64] flex items-center justify-center text-[#8494b2]">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-[#fb923c]/20 flex items-center justify-center text-[#fb923c]">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+            </svg>
+          </div>
+          <div className="h-8 w-8 rounded-full border border-[#1e3a64] flex items-center justify-center text-[#8494b2]">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
+        </div>
+        <div className="w-48 h-1 bg-[#1e3a64] rounded-full mt-5 overflow-hidden">
+          <div className="w-2/5 h-full bg-[#fb923c]/60 rounded-full" />
+        </div>
+      </div>
     ),
-    tag: "AI-powered",
   },
 ];
 
-const STEPS = [
-  {
-    step: "1",
-    title: "Paste your text",
-    description: "Lecture notes, syllabus sections, textbook excerpts - anything academic.",
-  },
-  {
-    step: "2",
-    title: "Pick a format",
-    description: "Conversation, bionic reading, or RSVP - whatever matches your brain today.",
-  },
-  {
-    step: "3",
-    title: "Read with less stress",
-    description: "Get your text back in a format that actually works for how you learn.",
-  },
+const STATS = [
+  { value: "4", label: "learning formats" },
+  { value: "<10s", label: "to transform" },
+  { value: "100%", label: "free to use" },
 ];
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-950">
-      {/* Hero */}
+    <div className="min-h-screen bg-[#0a1628]">
+      {/* ── Hero ── */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-900/20 via-gray-950 to-gray-950" />
-        <div className="relative max-w-4xl mx-auto px-4 pt-20 pb-16 sm:pt-28 sm:pb-24 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/10 border border-teal-400/20 text-teal-300 text-sm font-medium mb-6">
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />
-            Built for how your brain works
+        {/* Radial gradient background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,_rgba(251,146,60,0.08),_transparent)]" />
+        {/* Breathing glow orb */}
+        <div className="hero-glow absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(251,146,60,0.12)_0%,_transparent_70%)] pointer-events-none" />
+
+        <div className="relative max-w-4xl mx-auto px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#fb923c]/10 border border-[#fb923c]/20 text-[#fb923c] text-sm font-medium mb-8">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#fb923c] animate-pulse" />
+            Built for how your brain actually works
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
-            Academic text,
+
+          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl text-white leading-[1.1] mb-6 tracking-tight">
+            Study less.
             <br />
-            <span className="text-teal-400">without the overwhelm</span>
+            <span className="text-[#fb923c]">Understand more.</span>
           </h1>
-          <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Paste your lecture notes, syllabi, or textbook excerpts and get them
-            back in formats designed to reduce cognitive load for students with
-            ADHD.
+
+          <p className="text-lg sm:text-xl text-[#8494b2] max-w-2xl mx-auto mb-12 leading-relaxed">
+            Paste your lecture notes, textbook excerpts, or syllabi and get them
+            back in formats designed to reduce cognitive load — conversation,
+            bionic reading, speed reading, and quizzes.
           </p>
-          <div className="flex flex-row items-center justify-center gap-4">
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/tool"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 hover:bg-teal-400 text-white font-semibold rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 text-lg"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#fb923c] hover:bg-[#f97316] text-white font-semibold rounded-xl shadow-lg shadow-[#fb923c]/20 transition-all duration-200 text-lg"
             >
               Start learning
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -99,9 +183,9 @@ export default function HomePage() {
             </Link>
             <Link
               href="/try"
-              className="inline-flex items-center gap-2 px-7 py-3 text-gray-300 hover:text-teal-300 font-medium transition-all duration-200 text-base"
+              className="inline-flex items-center gap-2 px-6 py-3 text-[#b8c4da] hover:text-[#fb923c] font-medium transition-colors duration-200 text-base"
             >
-              or try a quick demo
+              Try a demo
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -110,78 +194,121 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="max-w-4xl mx-auto px-4 py-16 sm:py-24">
-        <h2 className="text-2xl font-bold text-white text-center mb-12">
-          How it works
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          {STEPS.map((s) => (
-            <div key={s.step} className="text-center">
-              <div className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-teal-500/15 text-teal-400 font-bold text-lg mb-4">
-                {s.step}
-              </div>
-              <h3 className="text-white font-semibold mb-2">{s.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                {s.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Formats */}
-      <section className="max-w-4xl mx-auto px-4 pb-16 sm:pb-24">
-        <h2 className="text-2xl font-bold text-white text-center mb-4">
-          Four ways to learn
-        </h2>
-        <p className="text-gray-400 text-center mb-12 max-w-xl mx-auto">
-          Different days call for different approaches. Pick the format that
-          matches your energy.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FORMATS.map((f) => (
-            <div
-              key={f.title}
-              className="p-6 rounded-2xl border border-gray-800 bg-gray-900/60 hover:border-gray-700 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="h-10 w-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400">
-                  {f.icon}
-                </div>
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
-                  {f.tag}
+      {/* ── Social proof bar ── */}
+      <Reveal>
+        <section className="border-t border-b border-[#1e3a64]/40 py-8">
+          <div className="max-w-4xl mx-auto px-4">
+            <p className="text-xs uppercase tracking-widest text-[#8494b2]/60 text-center mb-5">
+              Trusted by students at
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+              {UNIVERSITIES.map((name) => (
+                <span
+                  key={name}
+                  className="text-sm font-medium text-[#8494b2]/80 tracking-wide"
+                >
+                  {name}
                 </span>
-              </div>
-              <h3 className="text-white font-semibold mb-2">{f.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                {f.description}
-              </p>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      </Reveal>
 
-      {/* CTA */}
-      <section className="max-w-4xl mx-auto px-4 pb-20 sm:pb-28 text-center">
-        <div className="p-8 sm:p-12 rounded-2xl border border-gray-800 bg-gradient-to-b from-teal-900/10 to-gray-900/50">
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Ready to study smarter?
-          </h2>
-          <p className="text-gray-400 mb-6">
-            Create a free account and start studying smarter.
-          </p>
-          <Link
-            href="/signup"
-            className="inline-flex items-center gap-2 px-7 py-3 bg-teal-500 hover:bg-teal-400 text-white font-semibold rounded-xl shadow-lg shadow-teal-500/20 transition-all duration-200"
-          >
-            Get started free
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </Link>
-        </div>
-      </section>
+      {/* ── Feature sections ── */}
+      <div className="max-w-5xl mx-auto px-4 py-20 sm:py-28 space-y-24 sm:space-y-32">
+        {FEATURES.map((feature, i) => (
+          <Reveal key={feature.eyebrow}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              {/* Text side */}
+              <div className={feature.align === "right" ? "lg:order-2" : ""}>
+                <span className="text-sm font-semibold text-[#fb923c] uppercase tracking-wider">
+                  {feature.eyebrow}
+                </span>
+                <h2 className="font-display text-3xl sm:text-4xl text-white mt-3 mb-4 tracking-tight leading-tight">
+                  {feature.title}
+                </h2>
+                <p className="text-[#8494b2] text-lg leading-relaxed">
+                  {feature.body}
+                </p>
+              </div>
+              {/* Mockup side */}
+              <div className={feature.align === "right" ? "lg:order-1" : ""}>
+                <div className="rounded-2xl border border-[#1e3a64]/60 bg-[#0f1d32] p-6 sm:p-8">
+                  {feature.mockup}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      {/* ── Transformation section ── */}
+      <Reveal>
+        <section className="relative py-20 sm:py-28">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f1d32] via-[#0a1628] to-[#0a1628]" />
+          <div className="relative max-w-3xl mx-auto px-4 text-center">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-white mb-6 tracking-tight leading-tight">
+              From overwhelmed<br />to understood
+            </h2>
+            <p className="text-lg text-[#8494b2] max-w-xl mx-auto mb-14 leading-relaxed">
+              Different days call for different approaches. Pick the format that
+              matches your energy — conversation, bionic, speed reading, or quiz.
+            </p>
+            <div className="grid grid-cols-3 gap-6 sm:gap-10 max-w-lg mx-auto">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-3xl sm:text-4xl font-display text-white mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs sm:text-sm text-[#8494b2]">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ── Final CTA ── */}
+      <Reveal>
+        <section className="max-w-4xl mx-auto px-4 pb-24 sm:pb-32">
+          <div className="relative rounded-2xl border border-[#1e3a64]/60 bg-[#0f1d32] px-8 py-14 sm:px-14 sm:py-18 text-center overflow-hidden">
+            {/* Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse,_rgba(251,146,60,0.1)_0%,_transparent_70%)] pointer-events-none" />
+
+            <div className="relative">
+              <h2 className="font-display text-3xl sm:text-4xl text-white mb-4 tracking-tight">
+                Ready to study smarter?
+              </h2>
+              <p className="text-[#8494b2] mb-8 text-lg max-w-md mx-auto">
+                Create a free account and transform how you learn.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#fb923c] hover:bg-[#f97316] text-white font-semibold rounded-xl shadow-lg shadow-[#fb923c]/20 transition-all duration-200 text-lg"
+                >
+                  Get started free
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </Link>
+                <Link
+                  href="/try"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-[#b8c4da] hover:text-[#fb923c] font-medium transition-colors duration-200 text-base"
+                >
+                  Try a demo first
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </Reveal>
     </div>
   );
 }
