@@ -36,13 +36,14 @@ export async function middleware(request: NextRequest) {
   const isDemo =
     pathname.startsWith("/tool") &&
     request.nextUrl.searchParams.get("demo") === "1";
-  const isChatApi = pathname.startsWith("/api/chat");
-  const isTakeawaysApi = pathname.startsWith("/api/takeaways");
+  const isOpenApi = pathname.startsWith("/api/chat") ||
+    pathname.startsWith("/api/takeaways") ||
+    pathname.startsWith("/api/transcribe");
 
-  // Protected routes: /tool and /api/* (except auth callback, /api/chat, /api/takeaways)
+  // Protected routes: /tool and /api/* (except auth callback and open APIs)
   const isProtected =
     (pathname.startsWith("/tool") && !isDemo) ||
-    (pathname.startsWith("/api") && !pathname.startsWith("/api/auth") && !isChatApi && !isTakeawaysApi);
+    (pathname.startsWith("/api") && !pathname.startsWith("/api/auth") && !isOpenApi);
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();

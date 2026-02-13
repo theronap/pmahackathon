@@ -55,7 +55,7 @@ export function Header() {
             </svg>
           </div>
           <span className="font-bold text-white text-lg group-hover:text-teal-300 transition-colors">
-            StudyLens
+            teachMe
           </span>
         </Link>
 

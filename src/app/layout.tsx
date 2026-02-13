@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "StudyLens - Academic Text Reformatter",
+  title: "teachMe - Learn Any Text Your Way",
   description:
-    "Transform dense academic text into digestible formats. Built for students with ADHD and anxiety.",
+    "Transform dense academic text into digestible formats. Built for students with ADHD.",
 };
 
 export default function RootLayout({

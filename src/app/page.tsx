@@ -85,23 +85,26 @@ export default function HomePage() {
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             Paste your lecture notes, syllabi, or textbook excerpts and get them
             back in formats designed to reduce cognitive load for students with
-            ADHD and anxiety.
+            ADHD.
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/tool"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-teal-500 hover:bg-teal-400 text-white font-semibold rounded-xl shadow-lg shadow-teal-500/25 transition-all duration-200 text-lg"
             >
-              Paste or upload &rarr; Start learning
+              Start learning
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
             </Link>
             <Link
               href="/try"
-              className="inline-flex items-center gap-2 px-7 py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-xl border border-gray-700 transition-all duration-200 text-lg"
+              className="inline-flex items-center gap-2 px-7 py-3 text-gray-300 hover:text-teal-300 font-medium transition-all duration-200 text-base"
             >
-              Try a quick demo
+              or try a quick demo
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
             </Link>
           </div>
         </div>

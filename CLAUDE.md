@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-StudyLens is a Next.js 16 (App Router) web application that transforms dense academic text into digestible formats for students with ADHD and anxiety. It uses React 19, TypeScript, Tailwind CSS 4, the Vercel AI SDK with Anthropic's Claude API, and Supabase for auth, database, and file storage.
+teachMe is a Next.js 16 (App Router) web application that transforms dense academic text into digestible formats for students with ADHD. It uses React 19, TypeScript, Tailwind CSS 4, the Vercel AI SDK with Anthropic's Claude API, and Supabase for auth, database, and file storage.
 
 ## Commands
 

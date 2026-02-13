@@ -73,12 +73,8 @@ function ToolContent() {
   const isOverLimit = charCount > MAX_CHARS;
   const canContinue = inputText.trim().length > 0 && !isOverLimit;
 
-  // Load preferences (skip in demo mode)
+  // Load preferences (try even in demo mode — user may be logged in)
   useEffect(() => {
-    if (isDemo) {
-      setReady(true);
-      return;
-    }
     const supabase = createClient();
     getProfile(supabase).then((profile) => {
       if (profile) {
@@ -86,13 +82,15 @@ function ToolContent() {
         setShowTypingIndicator(profile.show_typing_indicator);
       }
       setReady(true);
+    }).catch(() => {
+      setReady(true);
     });
-  }, [isDemo]);
+  }, []);
 
-  // Save preferences (skip in demo mode)
+  // Save preferences (skip in demo-only mode, but allow if user is logged in)
   const prefsRef = useRef({ conversationStyle, showTypingIndicator });
   useEffect(() => {
-    if (!ready || isDemo) return;
+    if (!ready) return;
     const prev = prefsRef.current;
     if (
       prev.conversationStyle === conversationStyle &&
@@ -104,18 +102,17 @@ function ToolContent() {
     updatePreferences(supabase, {
       preferred_style: conversationStyle,
       show_typing_indicator: showTypingIndicator,
-    });
-  }, [conversationStyle, showTypingIndicator, ready, isDemo]);
+    }).catch(() => { /* ignore if not logged in */ });
+  }, [conversationStyle, showTypingIndicator, ready]);
 
-  // Handle sample prefill
+  // Handle sample prefill — just fill in text, let user edit before continuing
+  const sampleLoaded = useRef(false);
   useEffect(() => {
-    if (isSample && inputText === "") {
+    if (isSample && !sampleLoaded.current) {
+      sampleLoaded.current = true;
       setInputText(SAMPLE_READING);
-      const c = chunkText(SAMPLE_READING);
-      setChunks(c);
-      setView("setup");
     }
-  }, [isSample, inputText]);
+  }, [isSample]);
 
   // Save session to DB (skip in demo mode)
   const saveResultToDb = useCallback(

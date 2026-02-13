@@ -39,7 +39,7 @@ export default function LoginPage() {
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
         <p className="text-gray-400 text-sm">
-          Sign in to your StudyLens account
+          Sign in to your teachMe account
         </p>
       </div>
 
