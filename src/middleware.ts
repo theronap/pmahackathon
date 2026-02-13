@@ -38,7 +38,8 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.searchParams.get("demo") === "1";
   const isOpenApi = pathname.startsWith("/api/chat") ||
     pathname.startsWith("/api/takeaways") ||
-    pathname.startsWith("/api/transcribe");
+    pathname.startsWith("/api/transcribe") ||
+    pathname.startsWith("/api/reformat");
 
   // Protected routes: /tool and /api/* (except auth callback and open APIs)
   const isProtected =
