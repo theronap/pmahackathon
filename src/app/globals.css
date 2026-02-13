@@ -12,13 +12,13 @@ body {
 
 /* ── Landing page theme ── */
 .theme-landing {
-  --header-bg: rgba(10, 22, 40, 0.80);
-  --header-border: rgba(30, 58, 100, 0.40);
-  --header-text: #b8c4da;
-  --header-text-hover: #e2e8f4;
-  --header-accent: #fb923c;
-  --header-accent-bg: rgba(251, 146, 60, 0.10);
-  --header-divider: rgba(30, 58, 100, 0.50);
+  --header-bg: rgba(249, 249, 247, 0.85);
+  --header-border: rgba(168, 183, 171, 0.40);
+  --header-text: #3E3E3E;
+  --header-text-hover: #2D4739;
+  --header-accent: #2D4739;
+  --header-accent-bg: rgba(45, 71, 57, 0.08);
+  --header-divider: rgba(168, 183, 171, 0.50);
 }
 
 .theme-tool {
