@@ -85,22 +85,13 @@ export interface Session {
 
 // Learning flow types
 
-export type LearningMode = "focus" | "story" | "game" | "groupchat" | "rsvp" | "plain";
+export type LearningMode = "focus" | "story" | "quiz" | "groupchat" | "rsvp" | "plain";
 
 export type TimePreference = "10min" | "15min" | "30min" | "custom" | "nolimit";
-
-export type GoalPreference = "finish" | "2chunks";
 
 export interface SetupConfig {
   mode: LearningMode;
   time: TimePreference | null;
-  goal: GoalPreference | null;
-}
-
-export interface TextChunk {
-  index: number;
-  text: string;
-  wordCount: number;
 }
 
 export interface GroupChatMessage {

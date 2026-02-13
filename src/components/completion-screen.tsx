@@ -4,11 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface CompletionScreenProps {
-  chunkCount: number;
   onFinish: () => void;
 }
 
-export function CompletionScreen({ chunkCount, onFinish }: CompletionScreenProps) {
+export function CompletionScreen({ onFinish }: CompletionScreenProps) {
   return (
     <div className="flex items-center justify-center min-h-[40vh]">
       <Card className="p-8 sm:p-12 text-center max-w-md mx-auto" glow>
@@ -21,7 +20,7 @@ export function CompletionScreen({ chunkCount, onFinish }: CompletionScreenProps
           You completed this reading.
         </h2>
         <p className="text-gray-400 text-sm mb-6">
-          {chunkCount} chunk{chunkCount !== 1 ? "s" : ""} finished
+          Nice work! Ready for another?
         </p>
         <Button onClick={onFinish}>Try another mode</Button>
       </Card>

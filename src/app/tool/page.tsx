@@ -13,11 +13,9 @@ import { GroupChatRenderer } from "@/components/renderers/group-chat-renderer";
 import { FileUpload } from "@/components/file-upload";
 import { VoiceRecorder } from "@/components/voice-recorder";
 import { SetupScreen } from "@/components/setup-screen";
-import { ProgressBar } from "@/components/progress-bar";
 import { CompletionScreen } from "@/components/completion-screen";
 import { KeyTakeawaysPanel } from "@/components/key-takeaways-panel";
 import { textToBionic } from "@/lib/bionic";
-import { chunkText } from "@/lib/chunker";
 import { SAMPLE_READING } from "@/lib/sample-text";
 import { createClient } from "@/lib/supabase/client";
 import { getProfile, updatePreferences } from "@/lib/db/profile";
@@ -29,7 +27,6 @@ import type {
   BionicResult,
   RSVPResult,
   SetupConfig,
-  TextChunk,
   GroupChatMessage,
   GroupChatResult,
 } from "@/types";
@@ -53,12 +50,10 @@ function ToolContent() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileStoragePath, setFileStoragePath] = useState<string | null>(null);
 
-  // Chunking state
-  const [chunks, setChunks] = useState<TextChunk[]>([]);
-  const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
+  // Setup config
   const [setupConfig, setSetupConfig] = useState<SetupConfig | null>(null);
 
-  // Per-chunk result state
+  // Result state
   const [result, setResult] = useState<ReformatResult | GroupChatResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,11 +111,11 @@ function ToolContent() {
 
   // Save session to DB (skip in demo mode)
   const saveResultToDb = useCallback(
-    async (resultData: ReformatResult, chunkText: string) => {
+    async (resultData: ReformatResult, text: string) => {
       if (isDemo) return;
       const supabase = createClient();
       await saveSession(supabase, {
-        input_text: chunkText,
+        input_text: text,
         input_source: inputMode === "upload" && fileName ? "file_upload" : "paste",
         file_name: fileName,
         file_storage_path: fileStoragePath,
@@ -134,8 +129,8 @@ function ToolContent() {
     [isDemo, inputMode, fileName, fileStoragePath, conversationStyle]
   );
 
-  // Process current chunk based on mode
-  const processChunk = useCallback(async (chunk: TextChunk, config: SetupConfig) => {
+  // Process full text based on mode
+  const processText = useCallback(async (text: string, config: SetupConfig) => {
     setError(null);
     setResult(null);
     setGroupChatMessages([]);
@@ -144,26 +139,24 @@ function ToolContent() {
 
     // Focus mode: bionic reading (client-side)
     if (mode === "focus") {
-      const paragraphs = textToBionic(chunk.text);
+      const paragraphs = textToBionic(text);
       const bionicResult: BionicResult = { format: "bionic", paragraphs };
       setResult(bionicResult);
-      await saveResultToDb(bionicResult, chunk.text);
+      await saveResultToDb(bionicResult, text);
       return;
     }
 
     // RSVP mode (client-side)
     if (mode === "rsvp") {
-      const words = chunk.text.split(/\s+/).filter((w) => w.length > 0);
+      const words = text.split(/\s+/).filter((w) => w.length > 0);
       const rsvpResult: RSVPResult = { format: "rsvp", words };
       setResult(rsvpResult);
-      await saveResultToDb(rsvpResult, chunk.text);
+      await saveResultToDb(rsvpResult, text);
       return;
     }
 
     // Plain mode (client-side)
     if (mode === "plain") {
-      // Use bionic result structure with no bolding — just set as-is
-      // We'll render plain text directly in the view
       setResult({ format: "bionic", paragraphs: [] } as BionicResult);
       return;
     }
@@ -176,7 +169,7 @@ function ToolContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            text: chunk.text,
+            text,
             format: "conversation",
             conversationStyle,
             useGenerate: true,
@@ -198,7 +191,7 @@ function ToolContent() {
         };
 
         setResult(finalResult);
-        await saveResultToDb(finalResult, chunk.text);
+        await saveResultToDb(finalResult, text);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong.");
       } finally {
@@ -207,15 +200,15 @@ function ToolContent() {
       return;
     }
 
-    // Game mode: quiz (non-streaming)
-    if (mode === "game") {
+    // Quiz mode (non-streaming)
+    if (mode === "quiz") {
       setLoading(true);
       try {
         const res = await fetch("/api/reformat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            text: chunk.text,
+            text,
             format: "quiz",
             ...(isDemo && { demo: true }),
           }),
@@ -228,7 +221,7 @@ function ToolContent() {
 
         const data = await res.json();
         setResult(data);
-        await saveResultToDb(data, chunk.text);
+        await saveResultToDb(data, text);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong.");
       } finally {
@@ -245,7 +238,7 @@ function ToolContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            text: chunk.text,
+            text,
             format: "groupchat",
             ...(isDemo && { demo: true }),
           }),
@@ -268,45 +261,25 @@ function ToolContent() {
     }
   }, [conversationStyle, isDemo, saveResultToDb]);
 
-  // Auto-process chunk when entering reading view or changing chunk
+  // Auto-process text when entering reading view
   useEffect(() => {
-    if (view === "reading" && setupConfig && chunks[currentChunkIndex]) {
-      processChunk(chunks[currentChunkIndex], setupConfig);
+    if (view === "reading" && setupConfig) {
+      processText(inputText, setupConfig);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, currentChunkIndex]);
+  }, [view]);
 
   function handleContinueToSetup() {
-    const c = chunkText(inputText);
-    setChunks(c);
-    setCurrentChunkIndex(0);
     setView("setup");
   }
 
   function handleSetupContinue(config: SetupConfig) {
     setSetupConfig(config);
-    setCurrentChunkIndex(0);
     setView("reading");
-  }
-
-  function handleNextChunk() {
-    if (currentChunkIndex < chunks.length - 1) {
-      setCurrentChunkIndex((i) => i + 1);
-    } else {
-      setView("done");
-    }
-  }
-
-  function handlePrevChunk() {
-    if (currentChunkIndex > 0) {
-      setCurrentChunkIndex((i) => i - 1);
-    }
   }
 
   function handleFinish() {
     setView("input");
-    setChunks([]);
-    setCurrentChunkIndex(0);
     setSetupConfig(null);
     setResult(null);
     setError(null);
@@ -318,8 +291,6 @@ function ToolContent() {
     setFileName(name);
     setFileStoragePath(storagePath);
   }
-
-  const currentChunk = chunks[currentChunkIndex];
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
@@ -436,17 +407,14 @@ function ToolContent() {
         {/* ========== SETUP VIEW ========== */}
         {view === "setup" && (
           <SetupScreen
-            chunks={chunks}
             onContinue={handleSetupContinue}
             onBack={() => setView("input")}
           />
         )}
 
         {/* ========== READING VIEW ========== */}
-        {view === "reading" && currentChunk && setupConfig && (
+        {view === "reading" && setupConfig && (
           <>
-            <ProgressBar current={currentChunkIndex} total={chunks.length} />
-
             {/* Error */}
             {error && (
               <Card className="p-4 mb-6 border-red-500/30 bg-red-500/5">
@@ -466,7 +434,7 @@ function ToolContent() {
 
             {/* Content + side panel grid */}
             {!loading && result && (
-              <div className={`${setupConfig.mode !== "game" ? "grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4" : ""} mb-6`}>
+              <div className={`${setupConfig.mode !== "quiz" ? "grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4" : ""} mb-6`}>
                 <Card className="p-6" glow>
                   {/* Focus mode: bionic */}
                   {setupConfig.mode === "focus" && result.format === "bionic" && (
@@ -482,8 +450,8 @@ function ToolContent() {
                     />
                   )}
 
-                  {/* Game mode: quiz */}
-                  {setupConfig.mode === "game" && result.format === "quiz" && (
+                  {/* Quiz mode */}
+                  {setupConfig.mode === "quiz" && result.format === "quiz" && (
                     <QuizRenderer questions={result.questions} />
                   )}
 
@@ -491,7 +459,7 @@ function ToolContent() {
                   {setupConfig.mode === "groupchat" && groupChatMessages.length > 0 && (
                     <GroupChatRenderer
                       messages={groupChatMessages}
-                      chunkText={currentChunk.text}
+                      chunkText={inputText}
                       onMessagesUpdate={setGroupChatMessages}
                     />
                   )}
@@ -504,7 +472,7 @@ function ToolContent() {
                   {/* Plain mode */}
                   {setupConfig.mode === "plain" && (
                     <div className="prose prose-invert max-w-none">
-                      {currentChunk.text.split(/\n\s*\n/).map((para, i) => (
+                      {inputText.split(/\n\s*\n/).map((para, i) => (
                         <p key={i} className="text-gray-200 leading-relaxed mb-4">
                           {para}
                         </p>
@@ -514,35 +482,26 @@ function ToolContent() {
                 </Card>
 
                 {/* Key Takeaways side panel — all modes except quiz */}
-                {setupConfig.mode !== "game" && (
-                  <KeyTakeawaysPanel chunkText={currentChunk.text} demo={isDemo} />
+                {setupConfig.mode !== "quiz" && (
+                  <KeyTakeawaysPanel chunkText={inputText} demo={isDemo} />
                 )}
               </div>
             )}
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between">
-              <Button
-                variant="secondary"
-                onClick={handlePrevChunk}
-                disabled={currentChunkIndex === 0 || loading}
-              >
-                Previous Chunk
-              </Button>
-              <Button
-                onClick={handleNextChunk}
-                disabled={loading}
-              >
-                {currentChunkIndex === chunks.length - 1 ? "Finish" : "Next Chunk"}
-              </Button>
-            </div>
+            {/* Done button */}
+            {!loading && result && (
+              <div className="flex items-center justify-end">
+                <Button onClick={() => setView("done")}>
+                  Done
+                </Button>
+              </div>
+            )}
           </>
         )}
 
         {/* ========== DONE VIEW ========== */}
         {view === "done" && (
           <CompletionScreen
-            chunkCount={chunks.length}
             onFinish={handleFinish}
           />
         )}
