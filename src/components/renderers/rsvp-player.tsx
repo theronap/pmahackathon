@@ -7,6 +7,16 @@ interface RSVPPlayerProps {
   words: string[];
 }
 
+/** Returns the anchor (ORP) letter index for a word based on its length. */
+function getAnchorIndex(word: string): number {
+  const len = word.length;
+  if (len <= 1) return 0;
+  if (len <= 5) return 1;
+  if (len <= 9) return 2;
+  if (len <= 13) return 3;
+  return 4;
+}
+
 /** Returns a multiplier for how long to pause on a given word. */
 function getPauseMultiplier(word: string): number {
   if (/[.!?]$/.test(word)) return 2.5; // end of sentence
@@ -120,11 +130,22 @@ export function RSVPPlayer({ words }: RSVPPlayerProps) {
 
   return (
     <div className="flex flex-col items-center" ref={containerRef}>
-      {/* Word display */}
-      <div className="w-full flex items-center justify-center min-h-[120px] mb-6 bg-gray-800/50 rounded-2xl border border-gray-700">
-        <span className="text-4xl sm:text-5xl font-mono font-bold text-white tracking-wide select-none">
-          {currentWord}
-        </span>
+      {/* Word display with ORP anchor */}
+      <div className="w-full flex flex-col items-center justify-center min-h-[120px] mb-6 bg-gray-800/50 rounded-2xl border border-gray-700 select-none">
+        {/* Fixation marker */}
+        <div className="text-teal-400 text-xs mb-1 select-none" aria-hidden="true">&#9662;</div>
+        {/* Word with fixed anchor position */}
+        <div className="flex justify-center text-4xl sm:text-5xl font-mono font-bold tracking-wide">
+          <span className="text-right text-white" style={{ width: "12ch" }}>
+            {currentWord.slice(0, getAnchorIndex(currentWord))}
+          </span>
+          <span className="text-teal-400">
+            {currentWord[getAnchorIndex(currentWord)] ?? ""}
+          </span>
+          <span className="text-left text-white" style={{ width: "12ch" }}>
+            {currentWord.slice(getAnchorIndex(currentWord) + 1)}
+          </span>
+        </div>
       </div>
 
       {/* Progress bar */}
